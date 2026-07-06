@@ -114,6 +114,9 @@ TRANSLATIONS = {
         "subscription_confirmation.followup": "Your coach will reach out at {phone} within 24 hours to kick off your first monthly plan.",
         "subscription_confirmation.back_home": "Back to Home",
 
+        "whatsapp.aria_label": "Chat with us on WhatsApp",
+        "whatsapp.message": "Hello, I have a question about your products",
+
         "calculators.title": "Calculators",
         "calculators.subtitle": "Work out your protein, calorie, and supplement needs for your goal.",
         "calculators.tab_supplements": "Supplement Calculator",
@@ -267,6 +270,9 @@ TRANSLATIONS = {
         "subscription_confirmation.other_instructions": "سنتواصل معك على {phone} قريبًا لإتمام الدفع.",
         "subscription_confirmation.followup": "سيتواصل معك مدربك على {phone} خلال 24 ساعة لبدء خطتك الشهرية الأولى.",
         "subscription_confirmation.back_home": "العودة إلى الرئيسية",
+
+        "whatsapp.aria_label": "تواصل معنا عبر واتساب",
+        "whatsapp.message": "مرحباً، عندي استفسار عن المنتجات",
 
         "calculators.title": "الحاسبات",
         "calculators.subtitle": "احسب احتياجك من البروتين والسعرات والمكملات المناسبة لهدفك.",
