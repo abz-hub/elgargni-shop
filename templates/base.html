@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+  <div class="page-loader" id="page-loader">
+    <span class="page-loader-mark">Elgargni <em>Shop</em></span>
+  </div>
+
   <header class="navbar">
     <div class="container navbar-inner">
       <a class="brand" href="{{ url_for('index') }}">Elgargni <span>Shop</span></a>
@@ -29,6 +33,9 @@
     </div>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

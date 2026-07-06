@@ -1,12 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="hero">
-    <div class="container">
-      <p class="eyebrow">Sports Nutrition</p>
-      <h1>Fuel your <span>performance.</span></h1>
-      <p class="hero-sub">Premium supplements built for training, recovery, and everyday wellness.</p>
-      <a class="btn" href="{{ url_for('products') }}">Shop the range</a>
+  <section class="hero" id="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-particles" aria-hidden="true">
+      {% for i in range(16) %}
+      <span class="hero-particle"></span>
+      {% endfor %}
+    </div>
+
+    <div class="hero-floaters" aria-hidden="true">
+      <div class="hero-floater hero-floater-jar" data-depth="0.6">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="3" width="12" height="3" rx="1"/><rect x="5" y="6" width="14" height="15" rx="2"/><rect x="8" y="9" width="8" height="2" opacity="0.5"/><rect x="8" y="13" width="8" height="2" opacity="0.5"/></svg>
+      </div>
+      <div class="hero-floater hero-floater-capsule-1" data-depth="0.3">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="9" width="20" height="6" rx="3"/></svg>
+      </div>
+      <div class="hero-floater hero-floater-capsule-2" data-depth="0.45">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="9" width="20" height="6" rx="3"/></svg>
+      </div>
+      <div class="hero-floater hero-floater-dumbbell" data-depth="0.2">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="1" y="10" width="3" height="4" rx="1"/><rect x="20" y="10" width="3" height="4" rx="1"/><rect x="4" y="8" width="2.5" height="8" rx="1"/><rect x="17.5" y="8" width="2.5" height="8" rx="1"/><rect x="6.5" y="11" width="11" height="2"/></svg>
+      </div>
+    </div>
+
+    <div class="container hero-content">
+      <p class="eyebrow hero-anim" style="animation-delay: 0s">Sports Nutrition</p>
+      <h1 class="hero-anim" style="animation-delay: 0.15s">Fuel your <span>performance.</span></h1>
+      <p class="hero-sub hero-anim" style="animation-delay: 0.3s">Premium supplements built for training, recovery, and everyday wellness.</p>
+      <a class="btn hero-anim" style="animation-delay: 0.45s" href="{{ url_for('products') }}">Shop the range</a>
+    </div>
+  </section>
+
+  <section class="section stats-strip">
+    <div class="container stats-grid">
+      <div class="stat reveal">
+        <span class="stat-number" data-count-to="15">0</span><span class="stat-suffix">+</span>
+        <p>Products</p>
+      </div>
+      <div class="stat reveal">
+        <span class="stat-number" data-count-to="100">0</span><span class="stat-suffix">%</span>
+        <p>Genuine BPI Stock</p>
+        <span class="stat-bar"><span class="stat-bar-fill" data-fill-to="100"></span></span>
+      </div>
+      <div class="stat reveal">
+        <span class="stat-number" data-count-to="24">0</span><span class="stat-suffix">h</span>
+        <p>Order Turnaround</p>
+      </div>
     </div>
   </section>
 
