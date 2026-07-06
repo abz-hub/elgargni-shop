@@ -19,6 +19,11 @@
       <div class="products-grid">
         {% for product in category.products %}
         <div class="product-card reveal" style="transition-delay: {{ (loop.index0 % 6) * 0.06 }}s">
+          {% if product.image_path %}
+          <div class="product-photo">
+            <img src="{{ url_for('static', filename=product.image_path) }}" alt="{{ product.name }} - {{ product.flavor }}" loading="lazy">
+          </div>
+          {% else %}
           <div class="product-thumb">
             {% if category.slug == 'protein-recovery' %}
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1" y="10" width="3" height="4" rx="1"/><rect x="20" y="10" width="3" height="4" rx="1"/><rect x="4" y="8" width="2.5" height="8" rx="1"/><rect x="17.5" y="8" width="2.5" height="8" rx="1"/><rect x="6.5" y="11" width="11" height="2"/></svg>
@@ -28,6 +33,7 @@
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C7 6 4 10.5 4 14a8 8 0 0 0 16 0c0-3.5-3-8-8-12z"/></svg>
             {% endif %}
           </div>
+          {% endif %}
           <h3>{{ product.name }}</h3>
           <p class="product-flavor">{{ product.flavor }}</p>
           <p class="product-size">{{ product.size }}</p>
