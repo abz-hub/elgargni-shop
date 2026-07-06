@@ -39,6 +39,17 @@
           <p class="product-size">{{ product.size }}</p>
           <p class="product-price">{{ product.price }} {{ currency }}</p>
           <span class="product-category">{{ category.name }}</span>
+          <button
+            type="button"
+            class="btn btn-outline btn-small quick-view-btn"
+            data-name="{{ product.name }}"
+            data-flavor="{{ product.flavor }}"
+            data-size="{{ product.size }}"
+            data-price="{{ product.price }} {{ currency }}"
+            data-image="{{ url_for('static', filename=product.image_path) if product.image_path else '' }}"
+            data-category-slug="{{ category.slug }}"
+            data-add-url="{{ url_for('cart_add', product_id=product.id) }}"
+          >Quick View</button>
           <form class="add-to-cart-form" action="{{ url_for('cart_add', product_id=product.id) }}" method="post">
             <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
             <button type="submit" class="btn btn-small">Add to Cart</button>
@@ -49,4 +60,22 @@
     </div>
   </section>
   {% endfor %}
+
+  <div class="quick-view-modal" id="quick-view-modal" aria-hidden="true">
+    <div class="quick-view-backdrop" data-modal-close></div>
+    <div class="quick-view-panel">
+      <button type="button" class="quick-view-close" data-modal-close aria-label="Close">&times;</button>
+      <div class="quick-view-media" id="quick-view-media"></div>
+      <div class="quick-view-info">
+        <h3 id="quick-view-name"></h3>
+        <p class="product-flavor" id="quick-view-flavor"></p>
+        <p class="product-size" id="quick-view-size"></p>
+        <p class="product-price" id="quick-view-price"></p>
+        <form class="add-to-cart-form" id="quick-view-form" method="post">
+          <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
+          <button type="submit" class="btn">Add to Cart</button>
+        </form>
+      </div>
+    </div>
+  </div>
 {% endblock %}
