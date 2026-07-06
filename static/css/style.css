@@ -165,6 +165,24 @@ body {
   box-shadow: 0 10px 24px rgba(198, 255, 43, 0.3);
 }
 
+.btn-outline {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-outline:hover {
+  border-color: var(--color-accent);
+  box-shadow: none;
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
 .section {
   padding: 96px 0;
   scroll-margin-top: 72px;
