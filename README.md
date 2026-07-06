@@ -111,8 +111,23 @@ themselves live in `calculators.js`.
 
 ## Deploy
 
-This app ships with a `Procfile` and `gunicorn`, so it can be deployed as-is
-to any host that supports the Procfile convention (Render, Railway, etc.):
+### Render (one-click blueprint)
+
+The repo has a `render.yaml` blueprint that configures everything
+automatically (build, start command, free plan, auto-generated
+`SECRET_KEY`). To deploy:
+
+1. Sign up at [render.com](https://render.com) with the GitHub account that
+   owns this repo.
+2. Click **New → Blueprint**, pick the `elgargni-shop` repo, and click
+   **Apply**.
+3. Wait for the build — you'll get a live URL like
+   `elgargni-shop.onrender.com`.
+
+### Any other Procfile host
+
+This app also ships with a `Procfile` and `gunicorn`, so it works on any
+Procfile-convention host (Railway, etc.):
 
 1. Create a new Web Service on your host and connect it to this GitHub repo.
 2. Build command: `pip install -r requirements.txt`
