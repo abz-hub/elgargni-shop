@@ -1,3 +1,6 @@
+import json
+
+import app as app_module
 from app import app
 
 
@@ -45,3 +48,84 @@ def test_product_with_image_file_renders_photo():
     response = client.get("/products")
     body = response.data.decode()
     assert 'src="/static/images/products/roxylean.webp"' in body
+
+
+def test_cart_add_and_view():
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "2"})
+    response = client.get("/cart")
+    body = response.data.decode()
+    assert "Whey HD" in body
+    assert "Qty: 2" in body
+    assert "1040 LYD" in body
+
+
+def test_cart_remove():
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    client.post("/cart/remove/1")
+    response = client.get("/cart")
+    assert "Your cart is empty" in response.data.decode()
+
+
+def test_checkout_redirects_when_cart_empty():
+    client = app.test_client()
+    response = client.get("/checkout")
+    assert response.status_code == 302
+
+
+def test_checkout_shows_payment_methods():
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    response = client.get("/checkout")
+    body = response.data.decode()
+    assert "Cash on Delivery" in body
+    assert "Bank Transfer" in body
+    assert "Coming soon" in body
+
+
+def test_checkout_submit_with_cod_creates_order(monkeypatch, tmp_path):
+    orders_file = tmp_path / "orders.jsonl"
+    monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
+
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    response = client.post(
+        "/checkout",
+        data={
+            "name": "Test Customer",
+            "phone": "0912345678",
+            "address": "Tripoli, Libya",
+            "payment_method": "cod",
+        },
+    )
+    body = response.data.decode()
+    assert response.status_code == 200
+    assert "Order Placed" in body
+
+    saved_order = json.loads(orders_file.read_text().strip())
+    assert saved_order["payment_method"] == "cod"
+    assert saved_order["customer"]["name"] == "Test Customer"
+
+    cart_response = client.get("/cart")
+    assert "Your cart is empty" in cart_response.data.decode()
+
+
+def test_checkout_rejects_unavailable_payment_method(monkeypatch, tmp_path):
+    orders_file = tmp_path / "orders.jsonl"
+    monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
+
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    response = client.post(
+        "/checkout",
+        data={
+            "name": "Test Customer",
+            "phone": "0912345678",
+            "address": "Tripoli, Libya",
+            "payment_method": "card",
+        },
+    )
+    body = response.data.decode()
+    assert "Please select a valid payment method" in body
+    assert not orders_file.exists()

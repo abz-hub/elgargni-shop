@@ -39,6 +39,10 @@
           <p class="product-size">{{ product.size }}</p>
           <p class="product-price">{{ product.price }} {{ currency }}</p>
           <span class="product-category">{{ category.name }}</span>
+          <form class="add-to-cart-form" action="{{ url_for('cart_add', product_id=product.id) }}" method="post">
+            <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
+            <button type="submit" class="btn btn-small">Add to Cart</button>
+          </form>
         </div>
         {% endfor %}
       </div>

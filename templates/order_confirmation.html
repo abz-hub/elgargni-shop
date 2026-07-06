@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed - Elgargni Shop{% endblock %}
+
+{% block content %}
+  <section class="section products-hero">
+    <div class="container">
+      <p class="eyebrow">Thank you, {{ order.customer.name }}</p>
+      <h1 class="page-title">Order Placed</h1>
+      <p>Order number <strong>{{ order.order_id }}</strong></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container checkout-layout">
+      <div class="checkout-form">
+        <h2>What's Next</h2>
+        {% if payment_method.id == 'cod' %}
+        <p>Have {{ order.total }} {{ currency }} in cash ready — you'll pay when your order arrives at:</p>
+        <p><strong>{{ order.customer.address }}</strong></p>
+        {% elif payment_method.id == 'bank_transfer' %}
+        <p>Please transfer {{ order.total }} {{ currency }} to our bank account and use <strong>{{ order.order_id }}</strong> as the payment reference. We'll confirm your order once the transfer is received.</p>
+        {% else %}
+        <p>We'll contact you at {{ order.customer.phone }} shortly to complete payment.</p>
+        {% endif %}
+        <p>We'll reach out at <strong>{{ order.customer.phone }}</strong> if we have any questions about your order.</p>
+        <a class="btn" href="{{ url_for('products') }}">Continue Shopping</a>
+      </div>
+
+      <aside class="order-summary">
+        <h2>Order Summary</h2>
+        {% for item in order.line_items %}
+        <div class="order-summary-row">
+          <span>{{ item.name }} ({{ item.flavor }}) &times; {{ item.quantity }}</span>
+          <span>{{ item.subtotal }} {{ currency }}</span>
+        </div>
+        {% endfor %}
+        <div class="order-summary-total">
+          <span>Total</span>
+          <span>{{ order.total }} {{ currency }}</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+{% endblock %}

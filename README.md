@@ -47,6 +47,17 @@ the `.jpg` extension in the filename or update `app.py` to match):
 | CLA + Carnitine | Rainbow Ice | `cla-carnitine-rainbow-ice.jpg` |
 | RoxyLean | Fat Burner & Thermogenic | `roxylean.jpg` |
 
+## Cart, checkout, and orders
+
+Customers can add products to a cart, then check out with a delivery address
+and one of these payment methods: Cash on Delivery, Bank Transfer, or
+Credit/Debit Card and Mobile Wallet (both marked "coming soon" until a real
+payment processor is integrated). Each completed order is appended as a line
+of JSON to `orders.jsonl` in the project root — **this file is gitignored on
+purpose**, since it contains customer names, phone numbers, and addresses
+and must never be committed or pushed to a public repo. Back it up
+separately if you need to keep order history.
+
 ## Deploy
 
 This app ships with a `Procfile` and `gunicorn`, so it can be deployed as-is
@@ -55,5 +66,8 @@ to any host that supports the Procfile convention (Render, Railway, etc.):
 1. Create a new Web Service on your host and connect it to this GitHub repo.
 2. Build command: `pip install -r requirements.txt`
 3. Start command: `gunicorn app:app --bind 0.0.0.0:$PORT` (already in the Procfile)
-4. Once deployed, add your custom domain in the host's dashboard and follow
+4. Set a `SECRET_KEY` environment variable on the host (used to sign cart
+   sessions) — without it, the app falls back to an insecure default that's
+   fine for local development only.
+5. Once deployed, add your custom domain in the host's dashboard and follow
    its instructions for the DNS records to add at your domain registrar.
