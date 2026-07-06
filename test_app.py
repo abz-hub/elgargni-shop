@@ -215,6 +215,25 @@ def test_set_language_redirects_back_to_referrer():
     assert response.headers["Location"] == "http://localhost/products"
 
 
+def test_whatsapp_button_renders_with_business_number():
+    client = app.test_client()
+    response = client.get("/")
+    body = response.data.decode()
+    assert "https://wa.me/218940000849" in body
+    assert 'class="whatsapp-btn"' in body
+
+
+def test_whatsapp_message_is_translated():
+    client = app.test_client()
+    en_body = client.get("/").data.decode()
+    assert "Hello%2C%20I%20have%20a%20question" in en_body
+
+    client.get("/set-language/ar")
+    ar_body = client.get("/").data.decode()
+    assert "wa.me/218940000849" in ar_body
+    assert "%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B" in ar_body
+
+
 def test_arabic_checkout_shows_translated_errors(monkeypatch, tmp_path):
     orders_file = tmp_path / "orders.jsonl"
     monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
