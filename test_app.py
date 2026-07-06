@@ -229,3 +229,68 @@ def test_arabic_checkout_shows_translated_errors(monkeypatch, tmp_path):
     body = response.data.decode()
     assert "الاسم مطلوب" in body
     assert not orders_file.exists()
+
+
+def test_calculators_page_returns_ok():
+    client = app.test_client()
+    response = client.get("/calculators")
+    assert response.status_code == 200
+
+
+def test_calculators_page_contains_form_options():
+    client = app.test_client()
+    response = client.get("/calculators")
+    body = response.data.decode()
+    assert "Muscle Gain" in body
+    assert "Weight Loss" in body
+    assert "Cutting" in body
+    assert "Performance" in body
+    assert "Sedentary" in body
+    assert "Moderate Activity" in body
+
+
+def test_calculators_page_contains_all_recommendation_sets():
+    client = app.test_client()
+    response = client.get("/calculators")
+    body = response.data.decode()
+    # muscle set
+    assert 'data-goal="muscle"' in body
+    # cut/lose shared set
+    assert 'data-goal="cut"' in body
+    assert 'data-goal="lose"' in body
+    # performance set
+    assert 'data-goal="performance"' in body
+    assert "Whey HD" in body
+    assert "Micronized Creatine" in body
+    assert "ISO HD" in body
+    assert "CLA + Carnitine" in body
+    assert "1.M.R The OG Formula" in body
+
+
+def test_calculators_recommendation_add_to_cart_links_are_real():
+    client = app.test_client()
+    response = client.get("/calculators")
+    body = response.data.decode()
+    assert 'action="/cart/add/1"' in body
+    assert 'action="/cart/add/8"' in body
+    assert 'action="/cart/add/6"' in body
+    assert 'action="/cart/add/14"' in body
+    assert 'action="/cart/add/11"' in body
+
+
+def test_calculators_nav_link_present():
+    client = app.test_client()
+    response = client.get("/")
+    body = response.data.decode()
+    assert 'href="/calculators"' in body
+    assert "Calculators" in body
+
+
+def test_calculators_page_in_arabic():
+    client = app.test_client()
+    client.get("/set-language/ar")
+    response = client.get("/calculators")
+    body = response.data.decode()
+    assert '<html lang="ar" dir="rtl">' in body
+    assert "زيادة عضل" in body
+    assert "الحاسبات" in body

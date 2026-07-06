@@ -39,6 +39,38 @@ PRODUCTS = [
 ]
 PRODUCTS_BY_ID = {p["id"]: p for p in PRODUCTS}
 
+# Supplement sets keyed by recommendation set id (goals map to one of these below)
+CALCULATOR_RECOMMENDATION_SETS = {
+    "muscle": [
+        {"product_id": 1, "timing_key": "calculators.timing.whey"},
+        {"product_id": 8, "timing_key": "calculators.timing.creatine"},
+    ],
+    "cut": [
+        {"product_id": 6, "timing_key": "calculators.timing.whey"},
+        {"product_id": 14, "timing_key": "calculators.timing.carnitine"},
+    ],
+    "performance": [
+        {"product_id": 8, "timing_key": "calculators.timing.creatine"},
+        {"product_id": 11, "timing_key": "calculators.timing.pre_workout"},
+    ],
+}
+
+# Calculator goal -> recommendation set (weight loss and cutting share the same stack)
+CALCULATOR_GOAL_TO_SET = {
+    "muscle": "muscle",
+    "lose": "cut",
+    "cut": "cut",
+    "performance": "performance",
+}
+
+# Protein target range (g per kg bodyweight) used by the supplement calculator, per goal
+CALCULATOR_PROTEIN_PER_KG = {
+    "muscle": 2.2,
+    "lose": 1.8,
+    "cut": 2.0,
+    "performance": 1.6,
+}
+
 PAYMENT_METHODS = [
     {"id": "cod", "available": True},
     {"id": "bank_transfer", "available": True},
@@ -279,6 +311,30 @@ def subscribe():
         currency="LYD",
         errors=[],
         form={},
+    )
+
+
+@app.route("/calculators")
+def calculators():
+    recommendation_sets = {}
+    for goal, set_id in CALCULATOR_GOAL_TO_SET.items():
+        items = []
+        for entry in CALCULATOR_RECOMMENDATION_SETS[set_id]:
+            product = PRODUCTS_BY_ID[entry["product_id"]]
+            items.append(
+                {
+                    "product": product,
+                    "image_path": product_image_url(product),
+                    "timing_key": entry["timing_key"],
+                }
+            )
+        recommendation_sets[goal] = items
+
+    return render_template(
+        "calculators.html",
+        recommendation_sets=recommendation_sets,
+        protein_per_kg=CALCULATOR_PROTEIN_PER_KG,
+        currency="LYD",
     )
 
 

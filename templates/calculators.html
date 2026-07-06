@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('calculators.title') }} - Elgargni Shop{% endblock %}
+
+{% block content %}
+  <section class="section products-hero">
+    <div class="container">
+      <p class="eyebrow">{{ t('nav.calculators') }}</p>
+      <h1 class="page-title">{{ t('calculators.title') }}</h1>
+      <p>{{ t('calculators.subtitle') }}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container calc-layout">
+      <form class="checkout-form calc-form" id="calc-form">
+        <h2>{{ t('calculators.gender') }}</h2>
+        <div class="gender-toggle">
+          <label class="gender-option">
+            <input type="radio" name="gender" value="male" checked>
+            <span>{{ t('calculators.gender_male') }}</span>
+          </label>
+          <label class="gender-option">
+            <input type="radio" name="gender" value="female">
+            <span>{{ t('calculators.gender_female') }}</span>
+          </label>
+        </div>
+
+        <label>
+          {{ t('calculators.age') }}
+          <input type="number" id="calc-age" min="10" max="90" value="25" required>
+        </label>
+        <label>
+          {{ t('calculators.weight') }}
+          <input type="number" id="calc-weight" min="30" max="250" step="0.5" value="75" required>
+        </label>
+        <label>
+          {{ t('calculators.height') }}
+          <input type="number" id="calc-height" min="100" max="230" value="175" required>
+        </label>
+        <label>
+          {{ t('calculators.activity') }}
+          <select id="calc-activity">
+            <option value="1.2">{{ t('calculators.activity_low') }}</option>
+            <option value="1.375">{{ t('calculators.activity_light') }}</option>
+            <option value="1.55" selected>{{ t('calculators.activity_moderate') }}</option>
+            <option value="1.725">{{ t('calculators.activity_high') }}</option>
+          </select>
+        </label>
+        <label>
+          {{ t('calculators.goal') }}
+          <select id="calc-goal">
+            <option value="muscle">{{ t('calculators.goal_muscle') }}</option>
+            <option value="lose">{{ t('calculators.goal_lose') }}</option>
+            <option value="cut">{{ t('calculators.goal_cut') }}</option>
+            <option value="performance">{{ t('calculators.goal_performance') }}</option>
+          </select>
+        </label>
+
+        <button type="submit" class="btn">{{ t('calculators.calculate') }}</button>
+      </form>
+
+      <div class="calc-results">
+        <div class="calc-tabs">
+          <button type="button" class="calc-tab active" data-tab="supplements">{{ t('calculators.tab_supplements') }}</button>
+          <button type="button" class="calc-tab" data-tab="macros">{{ t('calculators.tab_macros') }}</button>
+        </div>
+
+        <div class="calc-panel active" id="panel-supplements">
+          <p class="calc-empty-state">{{ t('calculators.fill_form_prompt') }}</p>
+
+          <div class="calc-panel-body" hidden>
+            <div class="calc-protein-target">
+              <p class="calc-protein-label">{{ t('calculators.protein_target') }}</p>
+              <p class="calc-protein-value"><span id="calc-protein-target-value">0</span> g</p>
+            </div>
+
+            <h3 class="calc-subheading">{{ t('calculators.recommended_supplements') }}</h3>
+
+            {% for goal, items in recommendation_sets.items() %}
+            <div class="recommendation-set" data-goal="{{ goal }}" hidden>
+              {% for item in items %}
+              <div class="recommendation-card">
+                {% if item.image_path %}
+                <div class="product-photo recommendation-photo">
+                  <img src="{{ url_for('static', filename=item.image_path) }}" alt="{{ item.product.name }} - {{ item.product.flavor }}" loading="lazy">
+                </div>
+                {% else %}
+                <div class="product-thumb recommendation-thumb">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1" y="10" width="3" height="4" rx="1"/><rect x="20" y="10" width="3" height="4" rx="1"/><rect x="4" y="8" width="2.5" height="8" rx="1"/><rect x="17.5" y="8" width="2.5" height="8" rx="1"/><rect x="6.5" y="11" width="11" height="2"/></svg>
+                </div>
+                {% endif %}
+                <div class="recommendation-info">
+                  <h4>{{ item.product.name }}</h4>
+                  <p class="product-flavor">{{ item.product.flavor }}</p>
+                  <p class="recommendation-timing">{{ t('calculators.dosage') }}: {{ t(item.timing_key) }}</p>
+                  <p class="product-price">{{ item.product.price }} {{ currency }}</p>
+                  <div class="recommendation-actions">
+                    <form class="add-to-cart-form" action="{{ url_for('cart_add', product_id=item.product.id) }}" method="post">
+                      <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
+                      <button type="submit" class="btn btn-small">{{ t('products.add_to_cart') }}</button>
+                    </form>
+                    <a class="view-options-link" href="{{ url_for('products') }}#{{ item.product.category }}">{{ t('calculators.view_options') }} &rarr;</a>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endfor %}
+
+            <p class="calc-disclaimer">{{ t('calculators.disclaimer') }}</p>
+          </div>
+        </div>
+
+        <div class="calc-panel" id="panel-macros">
+          <p class="calc-empty-state">{{ t('calculators.fill_form_prompt') }}</p>
+
+          <div class="calc-panel-body" hidden>
+            <div class="macro-layout">
+              <div class="macro-donut-wrap">
+                <div class="macro-donut" id="macro-donut"></div>
+              </div>
+              <div class="macro-cards">
+                <div class="macro-card macro-card-calories">
+                  <span class="macro-card-value" id="calc-calories">0</span>
+                  <span class="macro-card-label">{{ t('calculators.daily_calories') }}</span>
+                </div>
+                <div class="macro-card">
+                  <span class="macro-dot macro-dot-protein"></span>
+                  <span class="macro-card-value" id="calc-protein">0 g</span>
+                  <span class="macro-card-label">{{ t('calculators.protein') }}</span>
+                </div>
+                <div class="macro-card">
+                  <span class="macro-dot macro-dot-carbs"></span>
+                  <span class="macro-card-value" id="calc-carbs">0 g</span>
+                  <span class="macro-card-label">{{ t('calculators.carbs') }}</span>
+                </div>
+                <div class="macro-card">
+                  <span class="macro-dot macro-dot-fats"></span>
+                  <span class="macro-card-value" id="calc-fats">0 g</span>
+                  <span class="macro-card-label">{{ t('calculators.fats') }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="calc-cta-row">
+              <button type="button" class="btn btn-outline" id="calc-share-btn" data-copied-label="{{ t('calculators.share_copied') }}">{{ t('calculators.share_result') }}</button>
+              <a class="btn" href="{{ url_for('subscribe') }}">{{ t('calculators.subscription_cta') }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/calculators.js') }}"></script>
+{% endblock %}
