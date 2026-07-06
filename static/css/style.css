@@ -14,12 +14,27 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.6;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .container {
@@ -38,12 +53,18 @@ body {
 }
 
 .navbar {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid transparent;
   position: sticky;
   top: 0;
   background: rgba(11, 11, 13, 0.9);
   backdrop-filter: blur(6px);
   z-index: 10;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.navbar.scrolled {
+  border-bottom-color: var(--color-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .navbar-inner {
@@ -94,6 +115,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.02em;
   margin: 0 0 24px;
+  animation: fade-up 0.7s ease both;
 }
 
 .hero h1 span {
@@ -105,6 +127,22 @@ body {
   font-size: 1.15rem;
   max-width: 520px;
   margin: 0 auto 40px;
+  animation: fade-up 0.7s ease 0.15s both;
+}
+
+.hero .btn {
+  animation: fade-up 0.7s ease 0.3s both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .btn {
@@ -118,14 +156,18 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: 0.9rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
 .btn:hover {
-  opacity: 0.85;
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(198, 255, 43, 0.3);
 }
 
 .section {
   padding: 96px 0;
+  scroll-margin-top: 72px;
 }
 
 .section-alt {
@@ -158,11 +200,13 @@ body {
   border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 28px;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.2s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .service-card:hover {
   border-color: var(--color-accent);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(198, 255, 43, 0.1);
 }
 
 .service-card h3 {
@@ -220,11 +264,13 @@ body {
   border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 24px;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.2s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .product-card:hover {
   border-color: var(--color-accent);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(198, 255, 43, 0.1);
 }
 
 .product-thumb {
@@ -236,9 +282,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-size: 1.4rem;
   margin-bottom: 16px;
+}
+
+.product-thumb svg {
+  width: 24px;
+  height: 24px;
+}
+
+.product-category {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
 }
 
 .product-card h3 {
