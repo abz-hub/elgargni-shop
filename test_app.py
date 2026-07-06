@@ -151,7 +151,7 @@ def test_subscribe_submit_creates_subscription(monkeypatch, tmp_path):
     )
     body = response.data.decode()
     assert response.status_code == 200
-    assert "You're In" in body
+    assert "Subscription Confirmed" in body
 
     saved = json.loads(subscriptions_file.read_text().strip())
     assert saved["payment_method"] == "cod"
@@ -171,3 +171,61 @@ def test_subscribe_rejects_missing_name(monkeypatch, tmp_path):
     body = response.data.decode()
     assert "Name is required" in body
     assert not subscriptions_file.exists()
+
+
+def test_default_language_is_english():
+    client = app.test_client()
+    response = client.get("/")
+    body = response.data.decode()
+    assert '<html lang="en" dir="ltr">' in body
+    assert "Fuel your" in body
+
+
+def test_set_language_to_arabic_switches_content_and_direction():
+    client = app.test_client()
+    client.get("/set-language/ar")
+    response = client.get("/")
+    body = response.data.decode()
+    assert '<html lang="ar" dir="rtl">' in body
+    assert "غذِّ" in body
+    assert "المنتجات" in body
+
+
+def test_set_language_persists_across_pages():
+    client = app.test_client()
+    client.get("/set-language/ar")
+    response = client.get("/products")
+    body = response.data.decode()
+    assert '<html lang="ar" dir="rtl">' in body
+    assert "جميع المنتجات" in body
+
+
+def test_set_language_rejects_invalid_code():
+    client = app.test_client()
+    client.get("/set-language/fr")
+    response = client.get("/")
+    body = response.data.decode()
+    assert '<html lang="en" dir="ltr">' in body
+
+
+def test_set_language_redirects_back_to_referrer():
+    client = app.test_client()
+    response = client.get("/set-language/ar", headers={"Referer": "http://localhost/products"})
+    assert response.status_code == 302
+    assert response.headers["Location"] == "http://localhost/products"
+
+
+def test_arabic_checkout_shows_translated_errors(monkeypatch, tmp_path):
+    orders_file = tmp_path / "orders.jsonl"
+    monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
+
+    client = app.test_client()
+    client.get("/set-language/ar")
+    client.post("/cart/add/1", data={"quantity": "1"})
+    response = client.post(
+        "/checkout",
+        data={"name": "", "phone": "", "address": "", "payment_method": "cod"},
+    )
+    body = response.data.decode()
+    assert "الاسم مطلوب" in body
+    assert not orders_file.exists()

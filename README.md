@@ -68,6 +68,24 @@ There's no recurring/automatic billing (no payment processor is integrated);
 each month the coach follows up with the customer directly using the contact
 info collected at signup.
 
+## Languages (English / Arabic)
+
+The whole site is bilingual. All UI text lives in `translations.py` as a
+flat `{key: string}` dict per language, looked up via a `t(key, **kwargs)`
+helper (bound to the current session's language and exposed to every
+template as `{{ t('some.key') }}`). Product names/flavors are proper nouns
+and stay untranslated by design.
+
+- Switch language via the globe toggle in the navbar, or by visiting
+  `/set-language/en` or `/set-language/ar` directly — the choice is stored
+  in the session and persists across pages.
+- Arabic renders right-to-left (`<html dir="rtl">`) with a dedicated Arabic
+  web font (Tajawal); English uses Bebas Neue/Inter as before.
+- To add a new string: add a key to both the `"en"` and `"ar"` dicts in
+  `translations.py`, then reference it with `{{ t('your.key') }}` in a
+  template (or `translate('your.key', lang=lang)` in `app.py` for
+  server-side text like form validation errors).
+
 ## Deploy
 
 This app ships with a `Procfile` and `gunicorn`, so it can be deployed as-is

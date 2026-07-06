@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Checkout - Elgargni Shop{% endblock %}
+{% block title %}{{ t('checkout.title') }} - Elgargni Shop{% endblock %}
 
 {% block content %}
   <section class="section products-hero">
     <div class="container">
-      <p class="eyebrow">Almost there</p>
-      <h1 class="page-title">Checkout</h1>
+      <p class="eyebrow">{{ t('checkout.eyebrow') }}</p>
+      <h1 class="page-title">{{ t('checkout.title') }}</h1>
     </div>
   </section>
 
@@ -23,21 +23,21 @@
         </div>
         {% endif %}
 
-        <h2>Delivery Details</h2>
+        <h2>{{ t('checkout.delivery_details') }}</h2>
         <label>
-          Full Name
+          {{ t('checkout.full_name') }}
           <input type="text" name="name" value="{{ form.get('name', '') }}" required>
         </label>
         <label>
-          Phone Number
+          {{ t('checkout.phone') }}
           <input type="tel" name="phone" value="{{ form.get('phone', '') }}" required>
         </label>
         <label>
-          Delivery Address
+          {{ t('checkout.address') }}
           <textarea name="address" rows="3" required>{{ form.get('address', '') }}</textarea>
         </label>
 
-        <h2>Payment Method</h2>
+        <h2>{{ t('checkout.payment_method') }}</h2>
         <div class="payment-methods">
           {% for method in payment_methods %}
           <label class="payment-method {{ '' if method.available else 'payment-method-disabled' }}">
@@ -49,17 +49,17 @@
               {% if form.get('payment_method') == method.id %}checked{% endif %}
               {% if loop.first and not form.get('payment_method') %}checked{% endif %}
             >
-            <span class="payment-method-label">{{ method.label }}{% if not method.available %} <em>(Coming soon)</em>{% endif %}</span>
-            <span class="payment-method-description">{{ method.description }}</span>
+            <span class="payment-method-label">{{ t('payment.' ~ method.id ~ '.label') }}{% if not method.available %} <em>({{ t('checkout.coming_soon') }})</em>{% endif %}</span>
+            <span class="payment-method-description">{{ t('payment.' ~ method.id ~ '.description') }}</span>
           </label>
           {% endfor %}
         </div>
 
-        <button type="submit" class="btn">Place Order</button>
+        <button type="submit" class="btn">{{ t('checkout.place_order') }}</button>
       </form>
 
       <aside class="order-summary">
-        <h2>Order Summary</h2>
+        <h2>{{ t('checkout.order_summary') }}</h2>
         {% for item in items %}
         <div class="order-summary-row">
           <span>{{ item.product.name }} ({{ item.product.flavor }}) &times; {{ item.quantity }}</span>
@@ -67,7 +67,7 @@
         </div>
         {% endfor %}
         <div class="order-summary-total">
-          <span>Total</span>
+          <span>{{ t('cart.total') }}</span>
           <span>{{ total }} {{ currency }}</span>
         </div>
       </aside>
