@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elgargni Shop</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="#">Elgargni Shop</a>
+      <nav>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Building things that work.</h1>
+      <p>We help businesses design, build, and ship software they can rely on.</p>
+      <a class="btn" href="#contact">Get in touch</a>
+    </div>
+  </section>
+
+  <section id="about" class="section">
+    <div class="container">
+      <h2>About</h2>
+      <p>
+        Elgargni Shop is a small studio focused on building clean, dependable
+        websites and tools for businesses that want to move fast without
+        cutting corners.
+      </p>
+    </div>
+  </section>
+
+  <section id="services" class="section section-alt">
+    <div class="container">
+      <h2>Services</h2>
+      <div class="services-grid">
+        {% for service in services %}
+        <div class="service-card">
+          <h3>{{ service.title }}</h3>
+          <p>{{ service.description }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <div class="container">
+      <h2>Contact</h2>
+      <p>Have a project in mind? We'd love to hear about it.</p>
+      <a class="btn" href="mailto:hello@elgargnishop.com">hello@elgargnishop.com</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 Elgargni Shop. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

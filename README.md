@@ -1,6 +1,6 @@
 # elgargni-shop
 
-A simple Python starter project.
+A business landing page built with Flask.
 
 ## Setup
 
@@ -11,5 +11,13 @@ pip install -r requirements.txt
 ## Run
 
 ```bash
-python main.py
+python app.py
+```
+
+Then open http://127.0.0.1:5000 in your browser.
+
+## Test
+
+```bash
+pytest
 ```
