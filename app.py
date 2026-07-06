@@ -4,16 +4,16 @@ app = Flask(__name__)
 
 SERVICES = [
     {
-        "title": "Consulting",
-        "description": "Strategic guidance to help your business make the right calls.",
+        "title": "Protein & Recovery",
+        "description": "Whey, casein, and BCAAs to rebuild and recover after every session.",
     },
     {
-        "title": "Design",
-        "description": "Clean, modern design that puts your brand front and center.",
+        "title": "Pre-Workout & Energy",
+        "description": "Clean energy blends to help you push harder and last longer.",
     },
     {
-        "title": "Development",
-        "description": "Reliable, well-built software tailored to your needs.",
+        "title": "Vitamins & Wellness",
+        "description": "Daily essentials to keep you performing at your peak, every day.",
     },
 ]
 

@@ -12,4 +12,5 @@ def test_index_contains_brand_and_services():
     response = client.get("/")
     body = response.data.decode()
     assert "Elgargni Shop" in body
-    assert "Consulting" in body
+    assert "Protein" in body
+    assert "Recovery" in body
