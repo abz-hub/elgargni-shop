@@ -129,3 +129,45 @@ def test_checkout_rejects_unavailable_payment_method(monkeypatch, tmp_path):
     body = response.data.decode()
     assert "Please select a valid payment method" in body
     assert not orders_file.exists()
+
+
+def test_subscribe_shows_plan_and_payment_methods():
+    client = app.test_client()
+    response = client.get("/subscribe")
+    body = response.data.decode()
+    assert "Full Coaching Plan" in body
+    assert "120" in body
+    assert "Cash on Delivery" in body
+
+
+def test_subscribe_submit_creates_subscription(monkeypatch, tmp_path):
+    subscriptions_file = tmp_path / "subscriptions.jsonl"
+    monkeypatch.setattr(app_module, "SUBSCRIPTIONS_LOG_PATH", str(subscriptions_file))
+
+    client = app.test_client()
+    response = client.post(
+        "/subscribe",
+        data={"name": "Test Customer", "phone": "0912345678", "payment_method": "cod"},
+    )
+    body = response.data.decode()
+    assert response.status_code == 200
+    assert "You're In" in body
+
+    saved = json.loads(subscriptions_file.read_text().strip())
+    assert saved["payment_method"] == "cod"
+    assert saved["customer"]["name"] == "Test Customer"
+    assert saved["price"] == 120
+
+
+def test_subscribe_rejects_missing_name(monkeypatch, tmp_path):
+    subscriptions_file = tmp_path / "subscriptions.jsonl"
+    monkeypatch.setattr(app_module, "SUBSCRIPTIONS_LOG_PATH", str(subscriptions_file))
+
+    client = app.test_client()
+    response = client.post(
+        "/subscribe",
+        data={"name": "", "phone": "0912345678", "payment_method": "cod"},
+    )
+    body = response.data.decode()
+    assert "Name is required" in body
+    assert not subscriptions_file.exists()

@@ -988,6 +988,85 @@ body.modal-open {
   overflow: hidden;
 }
 
+.pricing-card {
+  max-width: 420px;
+  margin: 40px auto 0;
+  padding: 40px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-accent);
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(198, 255, 43, 0.08);
+}
+
+.pricing-plan-name {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+}
+
+.pricing-price {
+  margin: 0 0 28px;
+}
+
+.pricing-amount {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  color: var(--color-accent);
+}
+
+.pricing-currency {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-accent);
+}
+
+.pricing-period {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.pricing-features {
+  list-style: none;
+  margin: 0 0 32px;
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pricing-features li {
+  position: relative;
+  padding-left: 28px;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.pricing-features li::before {
+  content: "\2713";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.pricing-card .btn {
+  width: 100%;
+}
+
+.pricing-features-compact {
+  margin-bottom: 20px;
+}
+
+.pricing-features-compact li {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
 .footer {
   border-top: 1px solid var(--color-border);
   padding: 28px 0;

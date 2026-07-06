@@ -19,6 +19,7 @@
       <nav>
         <a href="{{ url_for('index') }}#about">About</a>
         <a href="{{ url_for('products') }}">Products</a>
+        <a href="{{ url_for('index') }}#coaching">Coaching</a>
         <a href="{{ url_for('index') }}#contact">Contact</a>
         <a href="{{ url_for('cart') }}" class="cart-link">Cart{% if cart_count %} ({{ cart_count }}){% endif %}</a>
       </nav>
