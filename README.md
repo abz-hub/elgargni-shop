@@ -86,6 +86,29 @@ and stay untranslated by design.
   template (or `translate('your.key', lang=lang)` in `app.py` for
   server-side text like form validation errors).
 
+## Calculators
+
+`/calculators` has two tools, computed instantly client-side in
+`static/js/calculators.js` (no server round-trip, no page reload):
+
+- **Supplement Calculator**: recommends a daily protein target (1.6–2.2 g/kg
+  depending on goal) and a 2-product stack per goal — muscle gain (whey +
+  creatine), weight loss/cutting (whey isolate + CLA+Carnitine as the
+  L-carnitine source), performance (creatine + 1.M.R pre-workout as the
+  citrulline source). Each recommended product is a real item from the
+  catalog with a working Add to Cart form (server-rendered, not fake).
+- **Calorie & Macro Calculator**: BMR via Mifflin-St Jeor, TDEE via activity
+  multiplier, calorie adjustment by goal (+300 muscle gain, −500 weight loss,
+  −300 cutting, 0 performance), macro split (protein fixed at 2 g/kg, fat 25%
+  of calories, carbs the remainder), visualized with a CSS conic-gradient
+  donut chart.
+
+Both goal→recommendation mapping (`CALCULATOR_RECOMMENDATION_SETS`,
+`CALCULATOR_GOAL_TO_SET`) and the protein-per-kg targets
+(`CALCULATOR_PROTEIN_PER_KG`) live in `app.py` — update those to change which
+products get recommended or the protein ratios. The BMR/TDEE/macro formulas
+themselves live in `calculators.js`.
+
 ## Deploy
 
 This app ships with a `Procfile` and `gunicorn`, so it can be deployed as-is

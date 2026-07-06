@@ -19,6 +19,7 @@
       <nav>
         <a href="{{ url_for('index') }}#about">{{ t('nav.about') }}</a>
         <a href="{{ url_for('products') }}">{{ t('nav.products') }}</a>
+        <a href="{{ url_for('calculators') }}">{{ t('nav.calculators') }}</a>
         <a href="{{ url_for('index') }}#coaching">{{ t('nav.coaching') }}</a>
         <a href="{{ url_for('index') }}#contact">{{ t('nav.contact') }}</a>
         <a href="{{ url_for('cart') }}" class="cart-link">{{ t('nav.cart') }}{% if cart_count %} ({{ cart_count }}){% endif %}</a>
@@ -49,5 +50,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>
