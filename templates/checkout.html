@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Elgargni Shop{% endblock %}
+
+{% block content %}
+  <section class="section products-hero">
+    <div class="container">
+      <p class="eyebrow">Almost there</p>
+      <h1 class="page-title">Checkout</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container checkout-layout">
+      <form class="checkout-form" action="{{ url_for('checkout') }}" method="post">
+        {% if errors %}
+        <div class="form-errors">
+          <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <h2>Delivery Details</h2>
+        <label>
+          Full Name
+          <input type="text" name="name" value="{{ form.get('name', '') }}" required>
+        </label>
+        <label>
+          Phone Number
+          <input type="tel" name="phone" value="{{ form.get('phone', '') }}" required>
+        </label>
+        <label>
+          Delivery Address
+          <textarea name="address" rows="3" required>{{ form.get('address', '') }}</textarea>
+        </label>
+
+        <h2>Payment Method</h2>
+        <div class="payment-methods">
+          {% for method in payment_methods %}
+          <label class="payment-method {{ '' if method.available else 'payment-method-disabled' }}">
+            <input
+              type="radio"
+              name="payment_method"
+              value="{{ method.id }}"
+              {% if not method.available %}disabled{% endif %}
+              {% if form.get('payment_method') == method.id %}checked{% endif %}
+              {% if loop.first and not form.get('payment_method') %}checked{% endif %}
+            >
+            <span class="payment-method-label">{{ method.label }}{% if not method.available %} <em>(Coming soon)</em>{% endif %}</span>
+            <span class="payment-method-description">{{ method.description }}</span>
+          </label>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn">Place Order</button>
+      </form>
+
+      <aside class="order-summary">
+        <h2>Order Summary</h2>
+        {% for item in items %}
+        <div class="order-summary-row">
+          <span>{{ item.product.name }} ({{ item.product.flavor }}) &times; {{ item.quantity }}</span>
+          <span>{{ item.subtotal }} {{ currency }}</span>
+        </div>
+        {% endfor %}
+        <div class="order-summary-total">
+          <span>Total</span>
+          <span>{{ total }} {{ currency }}</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+{% endblock %}

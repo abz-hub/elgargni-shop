@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Cart - Elgargni Shop{% endblock %}
+
+{% block content %}
+  <section class="section products-hero">
+    <div class="container">
+      <p class="eyebrow">Your Order</p>
+      <h1 class="page-title">Cart</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {% if items %}
+      <div class="cart-list">
+        {% for item in items %}
+        <div class="cart-row">
+          <div class="cart-row-info">
+            <h3>{{ item.product.name }}</h3>
+            <p class="product-flavor">{{ item.product.flavor }} &middot; {{ item.product.size }}</p>
+          </div>
+          <div class="cart-row-qty">Qty: {{ item.quantity }}</div>
+          <div class="cart-row-subtotal">{{ item.subtotal }} {{ currency }}</div>
+          <form action="{{ url_for('cart_remove', product_id=item.product.id) }}" method="post">
+            <button type="submit" class="btn btn-outline btn-small">Remove</button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="cart-summary">
+        <p class="cart-total">Total: <span>{{ total }} {{ currency }}</span></p>
+        <a class="btn" href="{{ url_for('checkout') }}">Proceed to Checkout</a>
+      </div>
+      {% else %}
+      <p>Your cart is empty.</p>
+      <a class="btn" href="{{ url_for('products') }}">Browse Products</a>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}
