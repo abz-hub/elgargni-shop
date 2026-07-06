@@ -4,15 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elgargni Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <header class="navbar">
     <div class="container navbar-inner">
-      <a class="brand" href="#">Elgargni Shop</a>
+      <a class="brand" href="#">Elgargni <span>Shop</span></a>
       <nav>
         <a href="#about">About</a>
-        <a href="#services">Services</a>
+        <a href="#services">Categories</a>
         <a href="#contact">Contact</a>
       </nav>
     </div>
@@ -20,26 +22,29 @@
 
   <section class="hero">
     <div class="container">
-      <h1>Building things that work.</h1>
-      <p>We help businesses design, build, and ship software they can rely on.</p>
-      <a class="btn" href="#contact">Get in touch</a>
+      <p class="eyebrow">Sports Nutrition</p>
+      <h1>Fuel your <span>performance.</span></h1>
+      <p class="hero-sub">Premium supplements built for training, recovery, and everyday wellness.</p>
+      <a class="btn" href="#contact">Shop the range</a>
     </div>
   </section>
 
   <section id="about" class="section">
     <div class="container">
-      <h2>About</h2>
+      <p class="eyebrow">About</p>
+      <h2>Built for athletes.<br>Backed by science.</h2>
       <p>
-        Elgargni Shop is a small studio focused on building clean, dependable
-        websites and tools for businesses that want to move fast without
-        cutting corners.
+        Elgargni Shop is a sports nutrition brand focused on clean, effective
+        supplements. No filler, no shortcuts &mdash; just what your body needs
+        to train harder and recover faster.
       </p>
     </div>
   </section>
 
   <section id="services" class="section section-alt">
     <div class="container">
-      <h2>Services</h2>
+      <p class="eyebrow">Categories</p>
+      <h2>Everything you need</h2>
       <div class="services-grid">
         {% for service in services %}
         <div class="service-card">
@@ -53,8 +58,9 @@
 
   <section id="contact" class="section">
     <div class="container">
-      <h2>Contact</h2>
-      <p>Have a project in mind? We'd love to hear about it.</p>
+      <p class="eyebrow">Contact</p>
+      <h2>Let's talk performance</h2>
+      <p>Questions about a stack or a plan? We're here to help.</p>
       <a class="btn" href="mailto:hello@elgargnishop.com">hello@elgargnishop.com</a>
     </div>
   </section>
