@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Products - Elgargni Shop{% endblock %}
+{% block title %}{{ t('products.title') }} - Elgargni Shop{% endblock %}
 
 {% block content %}
   <section class="section products-hero">
     <div class="container">
-      <p class="eyebrow">Shop</p>
-      <h1 class="page-title">All Products</h1>
-      <p>Browse our full range of supplements.</p>
+      <p class="eyebrow">{{ t('products.eyebrow') }}</p>
+      <h1 class="page-title">{{ t('products.title') }}</h1>
+      <p>{{ t('products.subtitle') }}</p>
     </div>
   </section>
 
   {% for category in grouped %}
   <section class="section {{ 'section-alt' if loop.index0 % 2 == 0 else '' }}" id="{{ category.slug }}">
     <div class="container">
-      <p class="eyebrow">{{ category.name }}</p>
-      <h2 class="reveal">{{ category.name }}</h2>
+      <p class="eyebrow">{{ t('category.' ~ category.slug ~ '.title') }}</p>
+      <h2 class="reveal">{{ t('category.' ~ category.slug ~ '.title') }}</h2>
       <div class="products-grid">
         {% for product in category.products %}
         <div class="product-card reveal" style="transition-delay: {{ (loop.index0 % 6) * 0.06 }}s">
@@ -38,7 +38,7 @@
           <p class="product-flavor">{{ product.flavor }}</p>
           <p class="product-size">{{ product.size }}</p>
           <p class="product-price">{{ product.price }} {{ currency }}</p>
-          <span class="product-category">{{ category.name }}</span>
+          <span class="product-category">{{ t('category.' ~ category.slug ~ '.title') }}</span>
           <button
             type="button"
             class="btn btn-outline btn-small quick-view-btn"
@@ -49,10 +49,10 @@
             data-image="{{ url_for('static', filename=product.image_path) if product.image_path else '' }}"
             data-category-slug="{{ category.slug }}"
             data-add-url="{{ url_for('cart_add', product_id=product.id) }}"
-          >Quick View</button>
+          >{{ t('products.quick_view') }}</button>
           <form class="add-to-cart-form" action="{{ url_for('cart_add', product_id=product.id) }}" method="post">
             <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
-            <button type="submit" class="btn btn-small">Add to Cart</button>
+            <button type="submit" class="btn btn-small">{{ t('products.add_to_cart') }}</button>
           </form>
         </div>
         {% endfor %}
@@ -73,7 +73,7 @@
         <p class="product-price" id="quick-view-price"></p>
         <form class="add-to-cart-form" id="quick-view-form" method="post">
           <input type="number" name="quantity" value="1" min="1" aria-label="Quantity">
-          <button type="submit" class="btn">Add to Cart</button>
+          <button type="submit" class="btn">{{ t('products.add_to_cart') }}</button>
         </form>
       </div>
     </div>

@@ -10,6 +10,24 @@
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+html[lang="ar"] {
+  --font-display: "Tajawal", sans-serif;
+  --font-body: "Tajawal", sans-serif;
+}
+
+html[lang="ar"] .hero h1,
+html[lang="ar"] .page-title,
+html[lang="ar"] .section h2,
+html[lang="ar"] .brand,
+html[lang="ar"] .btn,
+html[lang="ar"] .service-card h3,
+html[lang="ar"] .product-card h3,
+html[lang="ar"] #quick-view-name,
+html[lang="ar"] .cart-row-info h3 {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -98,7 +116,7 @@ body {
   transition: color 0.2s ease;
 }
 
-.navbar nav a:not(.cart-link)::after {
+.navbar nav a:not(.cart-link):not(.lang-switch)::after {
   content: "";
   position: absolute;
   left: 0;
@@ -113,7 +131,7 @@ body {
   color: var(--color-accent);
 }
 
-.navbar nav a:not(.cart-link):hover::after {
+.navbar nav a:not(.cart-link):not(.lang-switch):hover::after {
   width: 100%;
 }
 
@@ -1082,5 +1100,84 @@ body.modal-open {
 
   .section h2 {
     font-size: 2rem;
+  }
+}
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 6px 14px !important;
+  margin-left: 16px;
+  color: var(--color-muted) !important;
+  text-transform: none !important;
+  transition: border-color 0.2s ease, transform 0.15s ease, color 0.2s ease;
+}
+
+.lang-switch:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent) !important;
+  transform: translateY(-2px);
+}
+
+.lang-switch svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.4s ease;
+}
+
+.lang-switch:hover svg {
+  transform: rotate(180deg);
+}
+
+/* RTL layout support for Arabic */
+html[dir="rtl"] body {
+  text-align: right;
+}
+
+html[dir="rtl"] .navbar nav a {
+  margin-left: 0;
+  margin-right: 28px;
+}
+
+html[dir="rtl"] .navbar nav a:first-child {
+  margin-right: 0;
+}
+
+html[dir="rtl"] .lang-switch {
+  margin-left: 0;
+  margin-right: 16px;
+}
+
+html[dir="rtl"] .service-link,
+html[dir="rtl"] .products-hero,
+html[dir="rtl"] .hero,
+html[dir="rtl"] .stats-grid,
+html[dir="rtl"] .pricing-card,
+html[dir="rtl"] .contact-links {
+  text-align: center;
+}
+
+html[dir="rtl"] .cart-row-qty,
+html[dir="rtl"] .cart-row-subtotal {
+  text-align: right;
+}
+
+html[dir="rtl"] .order-summary-row,
+html[dir="rtl"] .order-summary-total {
+  direction: rtl;
+}
+
+html[dir="rtl"] .quick-view-close {
+  right: auto;
+  left: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-switch svg,
+  .lang-switch {
+    transition: none;
   }
 }

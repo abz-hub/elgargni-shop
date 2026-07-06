@@ -1,34 +1,34 @@
 {% extends "base.html" %}
 
-{% block title %}Order Confirmed - Elgargni Shop{% endblock %}
+{% block title %}{{ t('order_confirmation.title') }} - Elgargni Shop{% endblock %}
 
 {% block content %}
   <section class="section products-hero">
     <div class="container">
-      <p class="eyebrow">Thank you, {{ order.customer.name }}</p>
-      <h1 class="page-title">Order Placed</h1>
-      <p>Order number <strong>{{ order.order_id }}</strong></p>
+      <p class="eyebrow">{{ t('order_confirmation.thank_you', name=order.customer.name) }}</p>
+      <h1 class="page-title">{{ t('order_confirmation.title') }}</h1>
+      <p>{{ t('order_confirmation.order_number') }} <strong>{{ order.order_id }}</strong></p>
     </div>
   </section>
 
   <section class="section">
     <div class="container checkout-layout">
       <div class="checkout-form">
-        <h2>What's Next</h2>
+        <h2>{{ t('order_confirmation.whats_next') }}</h2>
         {% if payment_method.id == 'cod' %}
-        <p>Have {{ order.total }} {{ currency }} in cash ready — you'll pay when your order arrives at:</p>
+        <p>{{ t('order_confirmation.cod_instructions', amount=(order.total|string) ~ ' ' ~ currency) }}</p>
         <p><strong>{{ order.customer.address }}</strong></p>
         {% elif payment_method.id == 'bank_transfer' %}
-        <p>Please transfer {{ order.total }} {{ currency }} to our bank account and use <strong>{{ order.order_id }}</strong> as the payment reference. We'll confirm your order once the transfer is received.</p>
+        <p>{{ t('order_confirmation.bank_transfer_instructions', amount=(order.total|string) ~ ' ' ~ currency, order_id=order.order_id) }}</p>
         {% else %}
-        <p>We'll contact you at {{ order.customer.phone }} shortly to complete payment.</p>
+        <p>{{ t('order_confirmation.other_instructions', phone=order.customer.phone) }}</p>
         {% endif %}
-        <p>We'll reach out at <strong>{{ order.customer.phone }}</strong> if we have any questions about your order.</p>
-        <a class="btn" href="{{ url_for('products') }}">Continue Shopping</a>
+        <p>{{ t('order_confirmation.followup', phone=order.customer.phone) }}</p>
+        <a class="btn" href="{{ url_for('products') }}">{{ t('order_confirmation.continue_shopping') }}</a>
       </div>
 
       <aside class="order-summary">
-        <h2>Order Summary</h2>
+        <h2>{{ t('checkout.order_summary') }}</h2>
         {% for item in order.line_items %}
         <div class="order-summary-row">
           <span>{{ item.name }} ({{ item.flavor }}) &times; {{ item.quantity }}</span>
@@ -36,7 +36,7 @@
         </div>
         {% endfor %}
         <div class="order-summary-total">
-          <span>Total</span>
+          <span>{{ t('cart.total') }}</span>
           <span>{{ order.total }} {{ currency }}</span>
         </div>
       </aside>

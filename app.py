@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 
 from flask import Flask, abort, redirect, render_template, request, session, url_for
 
+from translations import t as translate
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 
@@ -12,88 +14,65 @@ PRODUCT_IMAGE_DIR = os.path.join(app.static_folder, "images", "products")
 ORDERS_LOG_PATH = os.path.join(os.path.dirname(__file__), "orders.jsonl")
 SUBSCRIPTIONS_LOG_PATH = os.path.join(os.path.dirname(__file__), "subscriptions.jsonl")
 
-SUBSCRIPTION_PLAN = {
-    "name": "Full Coaching Plan",
-    "price": 120,
-    "billing_period": "month",
-    "features": [
-        "Personalized monthly diet and meal plan",
-        "Regular check-ins and progress tracking",
-        "Supplement guidance tailored to your goals",
-        "Direct access to your coach",
-    ],
-}
+SUBSCRIPTION_PLAN = {"id": "full-coaching-plan", "price": 120, "feature_keys": [
+    "plan.feature.1", "plan.feature.2", "plan.feature.3", "plan.feature.4",
+]}
 
-CATEGORIES = ["Protein & Recovery", "Pre-Workout & Energy", "Vitamins & Wellness"]
-
-
-def slugify(category):
-    return category.lower().replace(" & ", "-").replace(" ", "-")
-
-
-SERVICES = [
-    {
-        "title": "Protein & Recovery",
-        "description": "Whey, casein, and BCAAs to rebuild and recover after every session.",
-    },
-    {
-        "title": "Pre-Workout & Energy",
-        "description": "Clean energy blends to help you push harder and last longer.",
-    },
-    {
-        "title": "Vitamins & Wellness",
-        "description": "Daily essentials to keep you performing at your peak, every day.",
-    },
-]
-for service in SERVICES:
-    service["slug"] = slugify(service["title"])
+CATEGORIES = ["protein-recovery", "pre-workout-energy", "vitamins-wellness"]
 
 PRODUCTS = [
-    {"id": 1, "name": "Whey HD", "flavor": "Chocolate Cookie", "size": "4.07 lbs", "price": 520, "category": "Protein & Recovery", "image": "whey-hd-chocolate-cookie.jpg"},
-    {"id": 2, "name": "Whey HD", "flavor": "Strawberry Cake", "size": "4.1 lbs", "price": 520, "category": "Protein & Recovery", "image": "whey-hd-strawberry-cake.jpg"},
-    {"id": 3, "name": "Whey HD", "flavor": "Milk and Cookies", "size": "4.1 lbs", "price": 520, "category": "Protein & Recovery", "image": "whey-hd-milk-and-cookies.jpg"},
-    {"id": 4, "name": "Whey HD", "flavor": "Blueberry Muffin", "size": "4.07 lbs", "price": 520, "category": "Protein & Recovery", "image": "whey-hd-blueberry-muffin.jpg"},
-    {"id": 5, "name": "Whey HD", "flavor": "Salted Caramel", "size": "4.07 lbs", "price": 520, "category": "Protein & Recovery", "image": "whey-hd-salted-caramel.jpg"},
-    {"id": 6, "name": "ISO HD", "flavor": "Cookies and Cream", "size": "4.9 lbs", "price": 580, "category": "Protein & Recovery", "image": "iso-hd-cookies-and-cream.jpg"},
-    {"id": 7, "name": "ISO HD", "flavor": "Chocolate Brownie", "size": "4.9 lbs", "price": 580, "category": "Protein & Recovery", "image": "iso-hd-chocolate-brownie.jpg"},
-    {"id": 8, "name": "Micronized Creatine", "flavor": "Unflavored", "size": "1.32 lbs (600g)", "price": 370, "category": "Protein & Recovery", "image": "micronized-creatine-unflavored.webp"},
-    {"id": 9, "name": "Best BCAA", "flavor": "Fruit Punch", "size": "10.58 oz (300g)", "price": 290, "category": "Pre-Workout & Energy", "image": "best-bcaa-fruit-punch.webp"},
-    {"id": 10, "name": "Best BCAA", "flavor": "Watermelon Ice", "size": "10.58 oz (300g)", "price": 290, "category": "Pre-Workout & Energy", "image": "best-bcaa-watermelon-ice.webp"},
-    {"id": 11, "name": "1.M.R The OG Formula", "flavor": "Fruit Punch", "size": "12.1 oz (342.5g)", "price": 340, "category": "Pre-Workout & Energy", "image": "1mr-og-fruit-punch.webp"},
-    {"id": 12, "name": "1.M.R The OG Formula", "flavor": "Sour Gummy", "size": "12.2 oz (346g)", "price": 340, "category": "Pre-Workout & Energy", "image": "1mr-og-sour-gummy.webp"},
-    {"id": 13, "name": "CLA + Carnitine", "flavor": "Snow Cone", "size": "12.34 oz (350g)", "price": 290, "category": "Vitamins & Wellness", "image": "cla-carnitine-snow-cone.jpg"},
-    {"id": 14, "name": "CLA + Carnitine", "flavor": "Rainbow Ice", "size": "12.34 oz (350g)", "price": 290, "category": "Vitamins & Wellness", "image": "cla-carnitine-rainbow-ice.webp"},
-    {"id": 15, "name": "RoxyLean", "flavor": "Fat Burner & Thermogenic", "size": "60 capsules", "price": 290, "category": "Vitamins & Wellness", "image": "roxylean.webp"},
+    {"id": 1, "name": "Whey HD", "flavor": "Chocolate Cookie", "size": "4.07 lbs", "price": 520, "category": "protein-recovery", "image": "whey-hd-chocolate-cookie.jpg"},
+    {"id": 2, "name": "Whey HD", "flavor": "Strawberry Cake", "size": "4.1 lbs", "price": 520, "category": "protein-recovery", "image": "whey-hd-strawberry-cake.jpg"},
+    {"id": 3, "name": "Whey HD", "flavor": "Milk and Cookies", "size": "4.1 lbs", "price": 520, "category": "protein-recovery", "image": "whey-hd-milk-and-cookies.jpg"},
+    {"id": 4, "name": "Whey HD", "flavor": "Blueberry Muffin", "size": "4.07 lbs", "price": 520, "category": "protein-recovery", "image": "whey-hd-blueberry-muffin.jpg"},
+    {"id": 5, "name": "Whey HD", "flavor": "Salted Caramel", "size": "4.07 lbs", "price": 520, "category": "protein-recovery", "image": "whey-hd-salted-caramel.jpg"},
+    {"id": 6, "name": "ISO HD", "flavor": "Cookies and Cream", "size": "4.9 lbs", "price": 580, "category": "protein-recovery", "image": "iso-hd-cookies-and-cream.jpg"},
+    {"id": 7, "name": "ISO HD", "flavor": "Chocolate Brownie", "size": "4.9 lbs", "price": 580, "category": "protein-recovery", "image": "iso-hd-chocolate-brownie.jpg"},
+    {"id": 8, "name": "Micronized Creatine", "flavor": "Unflavored", "size": "1.32 lbs (600g)", "price": 370, "category": "protein-recovery", "image": "micronized-creatine-unflavored.webp"},
+    {"id": 9, "name": "Best BCAA", "flavor": "Fruit Punch", "size": "10.58 oz (300g)", "price": 290, "category": "pre-workout-energy", "image": "best-bcaa-fruit-punch.webp"},
+    {"id": 10, "name": "Best BCAA", "flavor": "Watermelon Ice", "size": "10.58 oz (300g)", "price": 290, "category": "pre-workout-energy", "image": "best-bcaa-watermelon-ice.webp"},
+    {"id": 11, "name": "1.M.R The OG Formula", "flavor": "Fruit Punch", "size": "12.1 oz (342.5g)", "price": 340, "category": "pre-workout-energy", "image": "1mr-og-fruit-punch.webp"},
+    {"id": 12, "name": "1.M.R The OG Formula", "flavor": "Sour Gummy", "size": "12.2 oz (346g)", "price": 340, "category": "pre-workout-energy", "image": "1mr-og-sour-gummy.webp"},
+    {"id": 13, "name": "CLA + Carnitine", "flavor": "Snow Cone", "size": "12.34 oz (350g)", "price": 290, "category": "vitamins-wellness", "image": "cla-carnitine-snow-cone.jpg"},
+    {"id": 14, "name": "CLA + Carnitine", "flavor": "Rainbow Ice", "size": "12.34 oz (350g)", "price": 290, "category": "vitamins-wellness", "image": "cla-carnitine-rainbow-ice.webp"},
+    {"id": 15, "name": "RoxyLean", "flavor": "Fat Burner & Thermogenic", "size": "60 capsules", "price": 290, "category": "vitamins-wellness", "image": "roxylean.webp"},
 ]
 PRODUCTS_BY_ID = {p["id"]: p for p in PRODUCTS}
 
 PAYMENT_METHODS = [
-    {
-        "id": "cod",
-        "label": "Cash on Delivery",
-        "description": "Pay in cash when your order arrives at your door.",
-        "available": True,
-    },
-    {
-        "id": "bank_transfer",
-        "label": "Bank Transfer",
-        "description": "Transfer the total to our bank account and use your order number as the reference.",
-        "available": True,
-    },
-    {
-        "id": "card",
-        "label": "Credit / Debit Card",
-        "description": "Coming soon — our team will contact you to complete payment securely.",
-        "available": False,
-    },
-    {
-        "id": "mobile_wallet",
-        "label": "Mobile Wallet",
-        "description": "Coming soon.",
-        "available": False,
-    },
+    {"id": "cod", "available": True},
+    {"id": "bank_transfer", "available": True},
+    {"id": "card", "available": False},
+    {"id": "mobile_wallet", "available": False},
 ]
 PAYMENT_METHODS_BY_ID = {m["id"]: m for m in PAYMENT_METHODS}
+
+
+def get_lang():
+    return session.get("lang", "en")
+
+
+@app.context_processor
+def inject_i18n():
+    lang = get_lang()
+    return {
+        "lang": lang,
+        "text_dir": "rtl" if lang == "ar" else "ltr",
+        "t": lambda key, **kwargs: translate(key, lang=lang, **kwargs),
+    }
+
+
+@app.context_processor
+def inject_cart_count():
+    cart = session.get("cart", {})
+    return {"cart_count": sum(cart.values())}
+
+
+@app.route("/set-language/<lang_code>")
+def set_language(lang_code):
+    if lang_code in ("en", "ar"):
+        session["lang"] = lang_code
+    return redirect(request.referrer or url_for("index"))
 
 
 def product_image_url(product):
@@ -123,23 +102,16 @@ def get_cart_total(items):
     return sum(item["subtotal"] for item in items)
 
 
-@app.context_processor
-def inject_cart_count():
-    cart = session.get("cart", {})
-    return {"cart_count": sum(cart.values())}
-
-
 @app.route("/")
 def index():
-    return render_template("index.html", services=SERVICES, plan=SUBSCRIPTION_PLAN, currency="LYD")
+    return render_template("index.html", categories=CATEGORIES, plan=SUBSCRIPTION_PLAN, currency="LYD")
 
 
 @app.route("/products")
 def products():
     grouped = [
         {
-            "name": category,
-            "slug": slugify(category),
+            "slug": category,
             "products": [
                 {**p, "image_path": product_image_url(p)}
                 for p in PRODUCTS
@@ -185,6 +157,7 @@ def checkout():
     if not items:
         return redirect(url_for("products"))
     total = get_cart_total(items)
+    lang = get_lang()
 
     if request.method == "POST":
         name = (request.form.get("name") or "").strip()
@@ -194,13 +167,13 @@ def checkout():
 
         errors = []
         if not name:
-            errors.append("Name is required.")
+            errors.append(translate("error.name_required", lang=lang))
         if not phone:
-            errors.append("Phone number is required.")
+            errors.append(translate("error.phone_required", lang=lang))
         if not address:
-            errors.append("Delivery address is required.")
+            errors.append(translate("error.address_required", lang=lang))
         if not payment_method or not payment_method["available"]:
-            errors.append("Please select a valid payment method.")
+            errors.append(translate("error.payment_method_invalid", lang=lang))
 
         if errors:
             return render_template(
@@ -255,6 +228,8 @@ def checkout():
 
 @app.route("/subscribe", methods=["GET", "POST"])
 def subscribe():
+    lang = get_lang()
+
     if request.method == "POST":
         name = (request.form.get("name") or "").strip()
         phone = (request.form.get("phone") or "").strip()
@@ -262,11 +237,11 @@ def subscribe():
 
         errors = []
         if not name:
-            errors.append("Name is required.")
+            errors.append(translate("error.name_required", lang=lang))
         if not phone:
-            errors.append("Phone number is required.")
+            errors.append(translate("error.phone_required", lang=lang))
         if not payment_method or not payment_method["available"]:
-            errors.append("Please select a valid payment method.")
+            errors.append(translate("error.payment_method_invalid", lang=lang))
 
         if errors:
             return render_template(
@@ -283,7 +258,7 @@ def subscribe():
             "created_at": datetime.now(timezone.utc).isoformat(),
             "customer": {"name": name, "phone": phone},
             "payment_method": payment_method["id"],
-            "plan": SUBSCRIPTION_PLAN["name"],
+            "plan": SUBSCRIPTION_PLAN["id"],
             "price": SUBSCRIPTION_PLAN["price"],
         }
         with open(SUBSCRIPTIONS_LOG_PATH, "a", encoding="utf-8") as f:

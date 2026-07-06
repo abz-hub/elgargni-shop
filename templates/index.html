@@ -25,10 +25,10 @@
     </div>
 
     <div class="container hero-content">
-      <p class="eyebrow hero-anim" style="animation-delay: 0s">Sports Nutrition</p>
-      <h1 class="hero-anim" style="animation-delay: 0.15s">Fuel your <span>performance.</span></h1>
-      <p class="hero-sub hero-anim" style="animation-delay: 0.3s">Premium supplements built for training, recovery, and everyday wellness.</p>
-      <a class="btn hero-anim" style="animation-delay: 0.45s" href="{{ url_for('products') }}">Shop the range</a>
+      <p class="eyebrow hero-anim" style="animation-delay: 0s">{{ t('hero.eyebrow') }}</p>
+      <h1 class="hero-anim" style="animation-delay: 0.15s">{{ t('hero.title_line1') }} <span>{{ t('hero.title_accent') }}</span></h1>
+      <p class="hero-sub hero-anim" style="animation-delay: 0.3s">{{ t('hero.subtitle') }}</p>
+      <a class="btn hero-anim" style="animation-delay: 0.45s" href="{{ url_for('products') }}">{{ t('hero.cta') }}</a>
     </div>
   </section>
 
@@ -36,84 +36,80 @@
     <div class="container stats-grid">
       <div class="stat reveal">
         <span class="stat-number" data-count-to="15">0</span><span class="stat-suffix">+</span>
-        <p>Products</p>
+        <p>{{ t('stats.products_label') }}</p>
       </div>
       <div class="stat reveal">
         <span class="stat-number" data-count-to="100">0</span><span class="stat-suffix">%</span>
-        <p>Genuine BPI Stock</p>
+        <p>{{ t('stats.genuine_label') }}</p>
         <span class="stat-bar"><span class="stat-bar-fill" data-fill-to="100"></span></span>
       </div>
       <div class="stat reveal">
         <span class="stat-number" data-count-to="24">0</span><span class="stat-suffix">h</span>
-        <p>Order Turnaround</p>
+        <p>{{ t('stats.turnaround_label') }}</p>
       </div>
     </div>
   </section>
 
   <section id="about" class="section">
     <div class="container">
-      <p class="eyebrow reveal">About</p>
-      <h2 class="reveal">Built for athletes.<br>Backed by science.</h2>
-      <p class="reveal">
-        Elgargni Shop is a sports nutrition brand focused on clean, effective
-        supplements. No filler, no shortcuts &mdash; just what your body needs
-        to train harder and recover faster.
-      </p>
+      <p class="eyebrow reveal">{{ t('about.eyebrow') }}</p>
+      <h2 class="reveal">{{ t('about.title_line1') }}<br>{{ t('about.title_line2') }}</h2>
+      <p class="reveal">{{ t('about.body') }}</p>
     </div>
   </section>
 
   <section id="services" class="section section-alt">
     <div class="container">
-      <p class="eyebrow reveal">Categories</p>
-      <h2 class="reveal">Everything you need</h2>
+      <p class="eyebrow reveal">{{ t('services.eyebrow') }}</p>
+      <h2 class="reveal">{{ t('services.title') }}</h2>
       <div class="services-grid">
-        {% for service in services %}
+        {% for slug in categories %}
         <div class="service-card reveal" style="transition-delay: {{ loop.index0 * 0.1 }}s">
           <div class="product-thumb">
-            {% if service.slug == 'protein-recovery' %}
+            {% if slug == 'protein-recovery' %}
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1" y="10" width="3" height="4" rx="1"/><rect x="20" y="10" width="3" height="4" rx="1"/><rect x="4" y="8" width="2.5" height="8" rx="1"/><rect x="17.5" y="8" width="2.5" height="8" rx="1"/><rect x="6.5" y="11" width="11" height="2"/></svg>
-            {% elif service.slug == 'pre-workout-energy' %}
+            {% elif slug == 'pre-workout-energy' %}
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="13,2 4,14 11,14 10,22 20,10 13,10"/></svg>
             {% else %}
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C7 6 4 10.5 4 14a8 8 0 0 0 16 0c0-3.5-3-8-8-12z"/></svg>
             {% endif %}
           </div>
-          <h3>{{ service.title }}</h3>
-          <p>{{ service.description }}</p>
-          <a class="service-link" href="{{ url_for('products') }}#{{ service.slug }}">View products &rarr;</a>
+          <h3>{{ t('category.' ~ slug ~ '.title') }}</h3>
+          <p>{{ t('category.' ~ slug ~ '.description') }}</p>
+          <a class="service-link" href="{{ url_for('products') }}#{{ slug }}">{{ t('services.view_products') }} &rarr;</a>
         </div>
         {% endfor %}
       </div>
     </div>
   </section>
 
-  <section id="coaching" class="section section-alt">
+  <section id="coaching" class="section">
     <div class="container">
-      <p class="eyebrow reveal">Coaching</p>
-      <h2 class="reveal">Get a plan built around you</h2>
-      <p class="reveal">Personal nutrition coaching to keep you on track, month after month.</p>
+      <p class="eyebrow reveal">{{ t('coaching.eyebrow') }}</p>
+      <h2 class="reveal">{{ t('coaching.title') }}</h2>
+      <p class="reveal">{{ t('coaching.subtitle') }}</p>
       <div class="pricing-card reveal">
-        <p class="pricing-plan-name">{{ plan.name }}</p>
+        <p class="pricing-plan-name">{{ t('plan.name') }}</p>
         <p class="pricing-price">
           <span class="pricing-amount">{{ plan.price }}</span>
           <span class="pricing-currency">{{ currency }}</span>
-          <span class="pricing-period">/ {{ plan.billing_period }}</span>
+          <span class="pricing-period">/ {{ t('plan.period') }}</span>
         </p>
         <ul class="pricing-features">
-          {% for feature in plan.features %}
-          <li>{{ feature }}</li>
+          {% for feature_key in plan.feature_keys %}
+          <li>{{ t(feature_key) }}</li>
           {% endfor %}
         </ul>
-        <a class="btn" href="{{ url_for('subscribe') }}">Subscribe Now</a>
+        <a class="btn" href="{{ url_for('subscribe') }}">{{ t('coaching.cta') }}</a>
       </div>
     </div>
   </section>
 
-  <section id="contact" class="section">
+  <section id="contact" class="section section-alt">
     <div class="container">
-      <p class="eyebrow reveal">Contact</p>
-      <h2 class="reveal">Let's talk performance</h2>
-      <p class="reveal">Questions about a stack or a plan? We're here to help.</p>
+      <p class="eyebrow reveal">{{ t('contact.eyebrow') }}</p>
+      <h2 class="reveal">{{ t('contact.title') }}</h2>
+      <p class="reveal">{{ t('contact.subtitle') }}</p>
       <div class="contact-links reveal">
         <a class="btn" href="mailto:elgargni.shop@outlook.com">elgargni.shop@outlook.com</a>
         <a class="btn btn-outline" href="tel:+218940000849">+218 940 000 849</a>
