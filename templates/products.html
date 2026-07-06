@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Products - Elgargni Shop{% endblock %}
+
+{% block content %}
+  <section class="section products-hero">
+    <div class="container">
+      <p class="eyebrow">Shop</p>
+      <h1 class="page-title">All Products</h1>
+      <p>Browse our full range of supplements.</p>
+    </div>
+  </section>
+
+  {% for category in grouped %}
+  <section class="section {{ 'section-alt' if loop.index0 % 2 == 0 else '' }}" id="{{ category.slug }}">
+    <div class="container">
+      <p class="eyebrow">{{ category.name }}</p>
+      <h2>{{ category.name }}</h2>
+      <div class="products-grid">
+        {% for product in category.products %}
+        <div class="product-card">
+          <div class="product-thumb">{{ product.name[:1] }}</div>
+          <h3>{{ product.name }}</h3>
+          <p class="product-flavor">{{ product.flavor }}</p>
+          <p class="product-size">{{ product.size }}</p>
+          <p class="product-price">{{ product.price }} {{ currency }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endfor %}
+{% endblock %}

@@ -1,31 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elgargni Shop</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-  <header class="navbar">
-    <div class="container navbar-inner">
-      <a class="brand" href="#">Elgargni <span>Shop</span></a>
-      <nav>
-        <a href="#about">About</a>
-        <a href="#services">Categories</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </div>
-  </header>
+{% extends "base.html" %}
 
+{% block content %}
   <section class="hero">
     <div class="container">
       <p class="eyebrow">Sports Nutrition</p>
       <h1>Fuel your <span>performance.</span></h1>
       <p class="hero-sub">Premium supplements built for training, recovery, and everyday wellness.</p>
-      <a class="btn" href="#contact">Shop the range</a>
+      <a class="btn" href="{{ url_for('products') }}">Shop the range</a>
     </div>
   </section>
 
@@ -50,6 +31,7 @@
         <div class="service-card">
           <h3>{{ service.title }}</h3>
           <p>{{ service.description }}</p>
+          <a class="service-link" href="{{ url_for('products') }}#{{ service.slug }}">View products &rarr;</a>
         </div>
         {% endfor %}
       </div>
@@ -64,11 +46,4 @@
       <a class="btn" href="mailto:hello@elgargnishop.com">hello@elgargnishop.com</a>
     </div>
   </section>
-
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Elgargni Shop. All rights reserved.</p>
-    </div>
-  </footer>
-</body>
-</html>
+{% endblock %}
