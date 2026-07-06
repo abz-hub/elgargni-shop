@@ -38,14 +38,14 @@ PRODUCTS = [
     {"name": "Whey HD", "flavor": "Salted Caramel", "size": "4.07 lbs", "price": 520, "category": "Protein & Recovery", "image": "whey-hd-salted-caramel.jpg"},
     {"name": "ISO HD", "flavor": "Cookies and Cream", "size": "4.9 lbs", "price": 580, "category": "Protein & Recovery", "image": "iso-hd-cookies-and-cream.jpg"},
     {"name": "ISO HD", "flavor": "Chocolate Brownie", "size": "4.9 lbs", "price": 580, "category": "Protein & Recovery", "image": "iso-hd-chocolate-brownie.jpg"},
-    {"name": "Micronized Creatine", "flavor": "Unflavored", "size": "1.32 lbs (600g)", "price": 370, "category": "Protein & Recovery", "image": "micronized-creatine-unflavored.jpg"},
-    {"name": "Best BCAA", "flavor": "Fruit Punch", "size": "10.58 oz (300g)", "price": 290, "category": "Pre-Workout & Energy", "image": "best-bcaa-fruit-punch.jpg"},
-    {"name": "Best BCAA", "flavor": "Watermelon Ice", "size": "10.58 oz (300g)", "price": 290, "category": "Pre-Workout & Energy", "image": "best-bcaa-watermelon-ice.jpg"},
-    {"name": "1.M.R The OG Formula", "flavor": "Fruit Punch", "size": "12.1 oz (342.5g)", "price": 340, "category": "Pre-Workout & Energy", "image": "1mr-og-fruit-punch.jpg"},
-    {"name": "1.M.R The OG Formula", "flavor": "Sour Gummy", "size": "12.2 oz (346g)", "price": 340, "category": "Pre-Workout & Energy", "image": "1mr-og-sour-gummy.jpg"},
+    {"name": "Micronized Creatine", "flavor": "Unflavored", "size": "1.32 lbs (600g)", "price": 370, "category": "Protein & Recovery", "image": "micronized-creatine-unflavored.webp"},
+    {"name": "Best BCAA", "flavor": "Fruit Punch", "size": "10.58 oz (300g)", "price": 290, "category": "Pre-Workout & Energy", "image": "best-bcaa-fruit-punch.webp"},
+    {"name": "Best BCAA", "flavor": "Watermelon Ice", "size": "10.58 oz (300g)", "price": 290, "category": "Pre-Workout & Energy", "image": "best-bcaa-watermelon-ice.webp"},
+    {"name": "1.M.R The OG Formula", "flavor": "Fruit Punch", "size": "12.1 oz (342.5g)", "price": 340, "category": "Pre-Workout & Energy", "image": "1mr-og-fruit-punch.webp"},
+    {"name": "1.M.R The OG Formula", "flavor": "Sour Gummy", "size": "12.2 oz (346g)", "price": 340, "category": "Pre-Workout & Energy", "image": "1mr-og-sour-gummy.webp"},
     {"name": "CLA + Carnitine", "flavor": "Snow Cone", "size": "12.34 oz (350g)", "price": 290, "category": "Vitamins & Wellness", "image": "cla-carnitine-snow-cone.jpg"},
-    {"name": "CLA + Carnitine", "flavor": "Rainbow Ice", "size": "12.34 oz (350g)", "price": 290, "category": "Vitamins & Wellness", "image": "cla-carnitine-rainbow-ice.jpg"},
-    {"name": "RoxyLean", "flavor": "Fat Burner & Thermogenic", "size": "60 capsules", "price": 290, "category": "Vitamins & Wellness", "image": "roxylean.jpg"},
+    {"name": "CLA + Carnitine", "flavor": "Rainbow Ice", "size": "12.34 oz (350g)", "price": 290, "category": "Vitamins & Wellness", "image": "cla-carnitine-rainbow-ice.webp"},
+    {"name": "RoxyLean", "flavor": "Fat Burner & Thermogenic", "size": "60 capsules", "price": 290, "category": "Vitamins & Wellness", "image": "roxylean.webp"},
 ]
 
 
