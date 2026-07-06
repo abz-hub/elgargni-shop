@@ -58,6 +58,16 @@ purpose**, since it contains customer names, phone numbers, and addresses
 and must never be committed or pushed to a public repo. Back it up
 separately if you need to keep order history.
 
+## Dietary coaching subscription
+
+The homepage has a pricing section for the "Full Coaching Plan" (120 LYD/month,
+defined in `app.py` as `SUBSCRIPTION_PLAN`). Signups go through `/subscribe`,
+reuse the same payment method selection as checkout, and are appended to a
+gitignored `subscriptions.jsonl` — same PII rules as `orders.jsonl` above.
+There's no recurring/automatic billing (no payment processor is integrated);
+each month the coach follows up with the customer directly using the contact
+info collected at signup.
+
 ## Deploy
 
 This app ships with a `Procfile` and `gunicorn`, so it can be deployed as-is

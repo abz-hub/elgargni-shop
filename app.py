@@ -10,6 +10,19 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-producti
 
 PRODUCT_IMAGE_DIR = os.path.join(app.static_folder, "images", "products")
 ORDERS_LOG_PATH = os.path.join(os.path.dirname(__file__), "orders.jsonl")
+SUBSCRIPTIONS_LOG_PATH = os.path.join(os.path.dirname(__file__), "subscriptions.jsonl")
+
+SUBSCRIPTION_PLAN = {
+    "name": "Full Coaching Plan",
+    "price": 120,
+    "billing_period": "month",
+    "features": [
+        "Personalized monthly diet and meal plan",
+        "Regular check-ins and progress tracking",
+        "Supplement guidance tailored to your goals",
+        "Direct access to your coach",
+    ],
+}
 
 CATEGORIES = ["Protein & Recovery", "Pre-Workout & Energy", "Vitamins & Wellness"]
 
@@ -118,7 +131,7 @@ def inject_cart_count():
 
 @app.route("/")
 def index():
-    return render_template("index.html", services=SERVICES)
+    return render_template("index.html", services=SERVICES, plan=SUBSCRIPTION_PLAN, currency="LYD")
 
 
 @app.route("/products")
@@ -235,6 +248,60 @@ def checkout():
         total=total,
         currency="LYD",
         payment_methods=PAYMENT_METHODS,
+        errors=[],
+        form={},
+    )
+
+
+@app.route("/subscribe", methods=["GET", "POST"])
+def subscribe():
+    if request.method == "POST":
+        name = (request.form.get("name") or "").strip()
+        phone = (request.form.get("phone") or "").strip()
+        payment_method = PAYMENT_METHODS_BY_ID.get(request.form.get("payment_method"))
+
+        errors = []
+        if not name:
+            errors.append("Name is required.")
+        if not phone:
+            errors.append("Phone number is required.")
+        if not payment_method or not payment_method["available"]:
+            errors.append("Please select a valid payment method.")
+
+        if errors:
+            return render_template(
+                "subscribe.html",
+                plan=SUBSCRIPTION_PLAN,
+                payment_methods=PAYMENT_METHODS,
+                currency="LYD",
+                errors=errors,
+                form=request.form,
+            )
+
+        subscription = {
+            "subscription_id": uuid.uuid4().hex[:8].upper(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "customer": {"name": name, "phone": phone},
+            "payment_method": payment_method["id"],
+            "plan": SUBSCRIPTION_PLAN["name"],
+            "price": SUBSCRIPTION_PLAN["price"],
+        }
+        with open(SUBSCRIPTIONS_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(subscription) + "\n")
+
+        return render_template(
+            "subscription_confirmation.html",
+            subscription=subscription,
+            payment_method=payment_method,
+            plan=SUBSCRIPTION_PLAN,
+            currency="LYD",
+        )
+
+    return render_template(
+        "subscribe.html",
+        plan=SUBSCRIPTION_PLAN,
+        payment_methods=PAYMENT_METHODS,
+        currency="LYD",
         errors=[],
         form={},
     )

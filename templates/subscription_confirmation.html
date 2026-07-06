@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Subscription Confirmed - Elgargni Shop{% endblock %}
+
+{% block content %}
+  <section class="section products-hero">
+    <div class="container">
+      <p class="eyebrow">Thank you, {{ subscription.customer.name }}</p>
+      <h1 class="page-title">You're In</h1>
+      <p>Subscription number <strong>{{ subscription.subscription_id }}</strong></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container checkout-layout">
+      <div class="checkout-form">
+        <h2>What's Next</h2>
+        {% if payment_method.id == 'cod' %}
+        <p>Have {{ plan.price }} {{ currency }} in cash ready — your coach will collect payment when your plan starts.</p>
+        {% elif payment_method.id == 'bank_transfer' %}
+        <p>Please transfer {{ plan.price }} {{ currency }} to our bank account and use <strong>{{ subscription.subscription_id }}</strong> as the payment reference. Your plan starts once the transfer is confirmed.</p>
+        {% else %}
+        <p>We'll contact you at {{ subscription.customer.phone }} shortly to complete payment.</p>
+        {% endif %}
+        <p>Your coach will reach out at <strong>{{ subscription.customer.phone }}</strong> within 24 hours to kick off your first monthly plan.</p>
+        <a class="btn" href="{{ url_for('index') }}">Back to Home</a>
+      </div>
+
+      <aside class="order-summary">
+        <h2>{{ plan.name }}</h2>
+        <ul class="pricing-features pricing-features-compact">
+          {% for feature in plan.features %}
+          <li>{{ feature }}</li>
+          {% endfor %}
+        </ul>
+        <div class="order-summary-total">
+          <span>Billed monthly</span>
+          <span>{{ plan.price }} {{ currency }}</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+{% endblock %}

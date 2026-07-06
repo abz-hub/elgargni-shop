@@ -87,6 +87,28 @@
     </div>
   </section>
 
+  <section id="coaching" class="section section-alt">
+    <div class="container">
+      <p class="eyebrow reveal">Coaching</p>
+      <h2 class="reveal">Get a plan built around you</h2>
+      <p class="reveal">Personal nutrition coaching to keep you on track, month after month.</p>
+      <div class="pricing-card reveal">
+        <p class="pricing-plan-name">{{ plan.name }}</p>
+        <p class="pricing-price">
+          <span class="pricing-amount">{{ plan.price }}</span>
+          <span class="pricing-currency">{{ currency }}</span>
+          <span class="pricing-period">/ {{ plan.billing_period }}</span>
+        </p>
+        <ul class="pricing-features">
+          {% for feature in plan.features %}
+          <li>{{ feature }}</li>
+          {% endfor %}
+        </ul>
+        <a class="btn" href="{{ url_for('subscribe') }}">Subscribe Now</a>
+      </div>
+    </div>
+  </section>
+
   <section id="contact" class="section">
     <div class="container">
       <p class="eyebrow reveal">Contact</p>

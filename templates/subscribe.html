@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Subscribe - Elgargni Shop{% endblock %}
+
+{% block content %}
+  <section class="section products-hero">
+    <div class="container">
+      <p class="eyebrow">Coaching</p>
+      <h1 class="page-title">Subscribe</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container checkout-layout">
+      <form class="checkout-form" action="{{ url_for('subscribe') }}" method="post">
+        {% if errors %}
+        <div class="form-errors">
+          <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <h2>Your Details</h2>
+        <label>
+          Full Name
+          <input type="text" name="name" value="{{ form.get('name', '') }}" required>
+        </label>
+        <label>
+          Phone Number
+          <input type="tel" name="phone" value="{{ form.get('phone', '') }}" required>
+        </label>
+
+        <h2>Payment Method</h2>
+        <div class="payment-methods">
+          {% for method in payment_methods %}
+          <label class="payment-method {{ '' if method.available else 'payment-method-disabled' }}">
+            <input
+              type="radio"
+              name="payment_method"
+              value="{{ method.id }}"
+              {% if not method.available %}disabled{% endif %}
+              {% if form.get('payment_method') == method.id %}checked{% endif %}
+              {% if loop.first and not form.get('payment_method') %}checked{% endif %}
+            >
+            <span class="payment-method-label">{{ method.label }}{% if not method.available %} <em>(Coming soon)</em>{% endif %}</span>
+            <span class="payment-method-description">{{ method.description }}</span>
+          </label>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn">Confirm Subscription</button>
+      </form>
+
+      <aside class="order-summary">
+        <h2>{{ plan.name }}</h2>
+        <ul class="pricing-features pricing-features-compact">
+          {% for feature in plan.features %}
+          <li>{{ feature }}</li>
+          {% endfor %}
+        </ul>
+        <div class="order-summary-total">
+          <span>Billed monthly</span>
+          <span>{{ plan.price }} {{ currency }}</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+{% endblock %}
