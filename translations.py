@@ -117,6 +117,13 @@ TRANSLATIONS = {
         "whatsapp.aria_label": "Chat with us on WhatsApp",
         "whatsapp.message": "Hello, I have a question about your products",
 
+        "coach.eyebrow": "Your Coach",
+        "coach.title": "Meet your coach",
+        "coach.name": "Waled Elgargni",
+        "coach.role": "Champion bodybuilder & nutrition coach",
+        "coach.bio": "Waled has spent years competing on bodybuilding stages and helping athletes transform their physiques. Every coaching plan and product recommendation at Elgargni Shop comes from real experience — on stage, in the gym, and with everyday athletes across Libya.",
+        "coach.cta": "Start training with Waled",
+
         "calculators.title": "Calculators",
         "calculators.subtitle": "Work out your protein, calorie, and supplement needs for your goal.",
         "calculators.tab_supplements": "Supplement Calculator",
@@ -273,6 +280,13 @@ TRANSLATIONS = {
 
         "whatsapp.aria_label": "تواصل معنا عبر واتساب",
         "whatsapp.message": "مرحباً، عندي استفسار عن المنتجات",
+
+        "coach.eyebrow": "مدربك",
+        "coach.title": "تعرّف على مدربك",
+        "coach.name": "وليد عبدالسلام القرقني",
+        "coach.role": "بطل كمال أجسام ومدرب تغذية",
+        "coach.bio": "قضى وليد سنوات في منافسات كمال الأجسام وفي مساعدة الرياضيين على تطوير أجسامهم. كل خطة تدريب وكل توصية منتج في إلقرقني شوب تأتي من خبرة حقيقية — على المسرح، وفي الصالة، ومع الرياضيين في مختلف أنحاء ليبيا.",
+        "coach.cta": "ابدأ التدريب مع وليد",
 
         "calculators.title": "الحاسبات",
         "calculators.subtitle": "احسب احتياجك من البروتين والسعرات والمكملات المناسبة لهدفك.",

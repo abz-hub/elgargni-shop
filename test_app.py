@@ -215,6 +215,22 @@ def test_set_language_redirects_back_to_referrer():
     assert response.headers["Location"] == "http://localhost/products"
 
 
+def test_coach_section_renders_in_english():
+    client = app.test_client()
+    body = client.get("/").data.decode()
+    assert "Waled Elgargni" in body
+    assert "Champion bodybuilder" in body
+    assert 'src="/static/images/coach.png"' in body
+
+
+def test_coach_section_renders_in_arabic():
+    client = app.test_client()
+    client.get("/set-language/ar")
+    body = client.get("/").data.decode()
+    assert "وليد عبدالسلام القرقني" in body
+    assert "بطل كمال أجسام" in body
+
+
 def test_whatsapp_button_renders_with_business_number():
     client = app.test_client()
     response = client.get("/")
