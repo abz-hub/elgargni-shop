@@ -1185,6 +1185,65 @@ html[dir="rtl"] .quick-view-close {
   }
 }
 
+.coach-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.coach-photo {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 20px 50px rgba(198, 255, 43, 0.08);
+}
+
+.coach-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.coach-name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--color-accent);
+  margin: 0 0 4px;
+  max-width: none;
+}
+
+html[lang="ar"] .coach-name {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.coach-role {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  margin: 0 0 16px;
+}
+
+.coach-info .btn {
+  margin-top: 8px;
+}
+
+@media (max-width: 800px) {
+  .coach-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .coach-photo {
+    max-width: 360px;
+    margin: 0 auto;
+  }
+}
+
 .whatsapp-btn {
   position: fixed;
   bottom: 24px;

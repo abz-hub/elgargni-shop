@@ -83,7 +83,23 @@
     </div>
   </section>
 
-  <section id="coaching" class="section">
+  <section id="coach" class="section">
+    <div class="container coach-layout">
+      <div class="coach-photo reveal">
+        <img src="{{ url_for('static', filename='images/coach.png') }}" alt="{{ t('coach.name') }}" loading="lazy">
+      </div>
+      <div class="coach-info">
+        <p class="eyebrow reveal">{{ t('coach.eyebrow') }}</p>
+        <h2 class="reveal">{{ t('coach.title') }}</h2>
+        <p class="coach-name reveal">{{ t('coach.name') }}</p>
+        <p class="coach-role reveal">{{ t('coach.role') }}</p>
+        <p class="reveal">{{ t('coach.bio') }}</p>
+        <a class="btn reveal" href="{{ url_for('subscribe') }}">{{ t('coach.cta') }}</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="coaching" class="section section-alt">
     <div class="container">
       <p class="eyebrow reveal">{{ t('coaching.eyebrow') }}</p>
       <h2 class="reveal">{{ t('coaching.title') }}</h2>
@@ -105,7 +121,7 @@
     </div>
   </section>
 
-  <section id="contact" class="section section-alt">
+  <section id="contact" class="section">
     <div class="container">
       <p class="eyebrow reveal">{{ t('contact.eyebrow') }}</p>
       <h2 class="reveal">{{ t('contact.title') }}</h2>
