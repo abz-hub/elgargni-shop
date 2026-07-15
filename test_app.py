@@ -1,4 +1,5 @@
 import json
+import urllib.parse
 
 import app as app_module
 from app import app
@@ -213,6 +214,76 @@ def test_set_language_redirects_back_to_referrer():
     response = client.get("/set-language/ar", headers={"Referer": "http://localhost/products"})
     assert response.status_code == 302
     assert response.headers["Location"] == "http://localhost/products"
+
+
+def test_order_does_not_notify_telegram_when_unconfigured(monkeypatch, tmp_path):
+    orders_file = tmp_path / "orders.jsonl"
+    monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
+    monkeypatch.delenv("TELEGRAM_BOT_TOKEN", raising=False)
+    monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
+
+    calls = []
+    monkeypatch.setattr("urllib.request.urlopen", lambda *a, **k: calls.append(1))
+
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    response = client.post(
+        "/checkout",
+        data={"name": "T", "phone": "09", "address": "Tripoli", "payment_method": "cod"},
+    )
+    assert response.status_code == 200
+    assert calls == []
+
+
+def test_order_notifies_telegram_when_configured(monkeypatch, tmp_path):
+    orders_file = tmp_path / "orders.jsonl"
+    monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "99999")
+
+    captured = {}
+
+    def fake_urlopen(req, timeout=None):
+        captured["url"] = req.full_url
+        captured["body"] = req.data.decode("utf-8")
+        return None
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    client.post(
+        "/checkout",
+        data={"name": "Sara", "phone": "0910000000", "address": "Tripoli", "payment_method": "cod"},
+    )
+
+    assert "api.telegram.org/bottest-token/sendMessage" in captured["url"]
+    text = urllib.parse.parse_qs(captured["body"])["text"][0]
+    assert "New Order" in text
+    assert "Sara" in text
+    assert "Whey HD" in text
+
+
+def test_order_still_succeeds_when_telegram_fails(monkeypatch, tmp_path):
+    orders_file = tmp_path / "orders.jsonl"
+    monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "99999")
+
+    def boom(*a, **k):
+        raise RuntimeError("telegram down")
+
+    monkeypatch.setattr("urllib.request.urlopen", boom)
+
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    response = client.post(
+        "/checkout",
+        data={"name": "T", "phone": "09", "address": "Tripoli", "payment_method": "cod"},
+    )
+    assert response.status_code == 200
+    assert "Order Placed" in response.data.decode()
+    assert json.loads(orders_file.read_text().strip())["customer"]["name"] == "T"
 
 
 def test_coach_section_renders_in_english():

@@ -10,3 +10,10 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.12.10
+      # Order/subscription notifications to Telegram (set these in the
+      # Render dashboard — see README "Order notifications"). Optional:
+      # if unset, the site works normally but sends no notifications.
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false

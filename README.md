@@ -109,6 +109,24 @@ Both goal→recommendation mapping (`CALCULATOR_RECOMMENDATION_SETS`,
 products get recommended or the protein ratios. The BMR/TDEE/macro formulas
 themselves live in `calculators.js`.
 
+## Order notifications (Telegram)
+
+When an order or subscription is placed, the app can send the owner an
+instant Telegram message with the full details. It is **off by default**
+and only activates when both environment variables below are set — if
+they are missing, the site works normally and simply sends nothing.
+A notification failure never blocks an order (errors are swallowed).
+
+Set these on the host (e.g. Render dashboard → Environment):
+
+- `TELEGRAM_BOT_TOKEN` — from @BotFather after `/newbot`.
+- `TELEGRAM_CHAT_ID` — your personal chat id (message @userinfobot to get
+  it, or send your bot a message and read it from
+  `https://api.telegram.org/bot<token>/getUpdates`).
+
+Implemented with the standard library (`urllib`), no extra dependency.
+See `notify_telegram()` in `app.py`.
+
 ## Deploy
 
 ### Render (one-click blueprint)
