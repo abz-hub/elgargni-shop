@@ -8,8 +8,8 @@ TRANSLATIONS = {
         "nav.calculators": "Calculators",
 
         "hero.eyebrow": "Sports Nutrition",
-        "hero.title_line1": "Fuel your",
-        "hero.title_accent": "performance.",
+        "hero.title_line1": "Get strong with",
+        "hero.title_accent": "Elgargni.",
         "hero.subtitle": "Premium supplements built for training, recovery, and everyday wellness.",
         "hero.cta": "Shop the range",
 
@@ -172,8 +172,8 @@ TRANSLATIONS = {
         "nav.calculators": "الحاسبات",
 
         "hero.eyebrow": "التغذية الرياضية",
-        "hero.title_line1": "غذِّ",
-        "hero.title_accent": "أداءك.",
+        "hero.title_line1": "كون قوي مع",
+        "hero.title_accent": "القرقني",
         "hero.subtitle": "مكملات غذائية فاخرة مصممة للتدريب والتعافي والعافية اليومية.",
         "hero.cta": "تسوق المنتجات",
 
