@@ -178,7 +178,7 @@ def test_default_language_is_english():
     response = client.get("/")
     body = response.data.decode()
     assert '<html lang="en" dir="ltr">' in body
-    assert "Fuel your" in body
+    assert "Get strong with" in body
 
 
 def test_set_language_to_arabic_switches_content_and_direction():
@@ -187,7 +187,7 @@ def test_set_language_to_arabic_switches_content_and_direction():
     response = client.get("/")
     body = response.data.decode()
     assert '<html lang="ar" dir="rtl">' in body
-    assert "غذِّ" in body
+    assert "كون قوي" in body
     assert "المنتجات" in body
 
 
