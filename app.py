@@ -194,6 +194,22 @@ def build_subscription_message(subscription, payment_method):
     )
 
 
+@app.route("/health")
+def health():
+    """Lightweight diagnostic — reports config presence only, never secrets."""
+    from flask import jsonify
+
+    return jsonify(
+        {
+            "status": "ok",
+            "telegram_configured": bool(
+                os.environ.get("TELEGRAM_BOT_TOKEN")
+                and os.environ.get("TELEGRAM_CHAT_ID")
+            ),
+        }
+    )
+
+
 @app.route("/")
 def index():
     return render_template("index.html", categories=CATEGORIES, plan=SUBSCRIPTION_PLAN, currency="LYD")
