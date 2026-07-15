@@ -1,5 +1,7 @@
 import json
 import os
+import urllib.parse
+import urllib.request
 import uuid
 from datetime import datetime, timezone
 
@@ -134,6 +136,64 @@ def get_cart_total(items):
     return sum(item["subtotal"] for item in items)
 
 
+def notify_telegram(text):
+    """Send an owner notification to Telegram.
+
+    No-op unless both TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are set.
+    Any failure is swallowed so a notification problem can never break an
+    order or subscription for the customer.
+    """
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return
+    try:
+        payload = urllib.parse.urlencode(
+            {"chat_id": chat_id, "text": text, "disable_web_page_preview": "true"}
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            data=payload,
+            method="POST",
+        )
+        urllib.request.urlopen(req, timeout=8)
+    except Exception:
+        pass
+
+
+def build_order_message(order, payment_method):
+    lines = [
+        f"\U0001f6d2 New Order #{order['order_id']}",
+        f"Total: {order['total']} LYD",
+        f"Payment: {translate('payment.' + payment_method['id'] + '.label', lang='en')}",
+        "",
+        f"Customer: {order['customer']['name']}",
+        f"Phone: {order['customer']['phone']}",
+        f"Address: {order['customer']['address']}",
+        "",
+        "Items:",
+    ]
+    for line_item in order["line_items"]:
+        lines.append(
+            f"- {line_item['name']} ({line_item['flavor']}) "
+            f"x{line_item['quantity']} = {line_item['subtotal']} LYD"
+        )
+    return "\n".join(lines)
+
+
+def build_subscription_message(subscription, payment_method):
+    return "\n".join(
+        [
+            f"⭐ New Subscription #{subscription['subscription_id']}",
+            f"Plan: Full Coaching Plan — {subscription['price']} LYD/month",
+            f"Payment: {translate('payment.' + payment_method['id'] + '.label', lang='en')}",
+            "",
+            f"Customer: {subscription['customer']['name']}",
+            f"Phone: {subscription['customer']['phone']}",
+        ]
+    )
+
+
 @app.route("/")
 def index():
     return render_template("index.html", categories=CATEGORIES, plan=SUBSCRIPTION_PLAN, currency="LYD")
@@ -238,6 +298,8 @@ def checkout():
         with open(ORDERS_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(json.dumps(order) + "\n")
 
+        notify_telegram(build_order_message(order, payment_method))
+
         session["cart"] = {}
 
         return render_template(
@@ -295,6 +357,8 @@ def subscribe():
         }
         with open(SUBSCRIPTIONS_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(json.dumps(subscription) + "\n")
+
+        notify_telegram(build_subscription_message(subscription, payment_method))
 
         return render_template(
             "subscription_confirmation.html",
