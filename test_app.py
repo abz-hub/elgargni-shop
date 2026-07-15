@@ -187,7 +187,7 @@ def test_set_language_to_arabic_switches_content_and_direction():
     response = client.get("/")
     body = response.data.decode()
     assert '<html lang="ar" dir="rtl">' in body
-    assert "كون قوي" in body
+    assert "كن قويًا" in body
     assert "المنتجات" in body
 
 

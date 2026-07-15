@@ -172,7 +172,7 @@ TRANSLATIONS = {
         "nav.calculators": "الحاسبات",
 
         "hero.eyebrow": "التغذية الرياضية",
-        "hero.title_line1": "كون قوي مع",
+        "hero.title_line1": "كن قويًا مع",
         "hero.title_accent": "القرقني",
         "hero.subtitle": "مكملات غذائية فاخرة مصممة للتدريب والتعافي والعافية اليومية.",
         "hero.cta": "تسوق المنتجات",
