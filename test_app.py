@@ -286,6 +286,62 @@ def test_order_still_succeeds_when_telegram_fails(monkeypatch, tmp_path):
     assert json.loads(orders_file.read_text().strip())["customer"]["name"] == "T"
 
 
+def test_order_notifies_whatsapp_when_configured(monkeypatch, tmp_path):
+    orders_file = tmp_path / "orders.jsonl"
+    monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
+    monkeypatch.delenv("TELEGRAM_BOT_TOKEN", raising=False)
+    monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
+    monkeypatch.setenv("CALLMEBOT_APIKEY", "key123")
+    monkeypatch.setenv("WHATSAPP_PHONE", "+218940000849")
+
+    captured = {}
+
+    def fake_urlopen(req, timeout=None):
+        captured["url"] = req if isinstance(req, str) else req.full_url
+        return None
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    client.post(
+        "/checkout",
+        data={"name": "Sara", "phone": "0910000000", "address": "Tripoli", "payment_method": "cod"},
+    )
+
+    assert "api.callmebot.com/whatsapp.php" in captured["url"]
+    assert "key123" in captured["url"]
+    assert "Sara" in urllib.parse.unquote_plus(captured["url"])
+
+
+def test_order_notifies_both_channels_when_both_configured(monkeypatch, tmp_path):
+    orders_file = tmp_path / "orders.jsonl"
+    monkeypatch.setattr(app_module, "ORDERS_LOG_PATH", str(orders_file))
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "tok")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "1")
+    monkeypatch.setenv("CALLMEBOT_APIKEY", "key123")
+    monkeypatch.setenv("WHATSAPP_PHONE", "+218940000849")
+
+    urls = []
+
+    def fake_urlopen(req, timeout=None):
+        urls.append(req if isinstance(req, str) else req.full_url)
+        return None
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"})
+    client.post(
+        "/checkout",
+        data={"name": "T", "phone": "09", "address": "Tripoli", "payment_method": "cod"},
+    )
+
+    joined = " ".join(urls)
+    assert "api.telegram.org" in joined
+    assert "api.callmebot.com" in joined
+
+
 def test_coach_section_renders_in_english():
     client = app.test_client()
     body = client.get("/").data.decode()

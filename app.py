@@ -161,6 +161,32 @@ def notify_telegram(text):
         pass
 
 
+def notify_whatsapp(text):
+    """Send an owner notification to WhatsApp via CallMeBot.
+
+    No-op unless both CALLMEBOT_APIKEY and WHATSAPP_PHONE are set.
+    Any failure is swallowed so a notification problem can never break an
+    order or subscription for the customer.
+    """
+    apikey = os.environ.get("CALLMEBOT_APIKEY")
+    phone = os.environ.get("WHATSAPP_PHONE")
+    if not apikey or not phone:
+        return
+    try:
+        params = urllib.parse.urlencode({"phone": phone, "text": text, "apikey": apikey})
+        urllib.request.urlopen(
+            f"https://api.callmebot.com/whatsapp.php?{params}", timeout=12
+        )
+    except Exception:
+        pass
+
+
+def notify_owner(text):
+    """Fan out an owner notification to every configured channel."""
+    notify_telegram(text)
+    notify_whatsapp(text)
+
+
 def build_order_message(order, payment_method):
     lines = [
         f"\U0001f6d2 New Order #{order['order_id']}",
@@ -205,6 +231,10 @@ def health():
             "telegram_configured": bool(
                 os.environ.get("TELEGRAM_BOT_TOKEN")
                 and os.environ.get("TELEGRAM_CHAT_ID")
+            ),
+            "whatsapp_configured": bool(
+                os.environ.get("CALLMEBOT_APIKEY")
+                and os.environ.get("WHATSAPP_PHONE")
             ),
         }
     )
@@ -314,7 +344,7 @@ def checkout():
         with open(ORDERS_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(json.dumps(order) + "\n")
 
-        notify_telegram(build_order_message(order, payment_method))
+        notify_owner(build_order_message(order, payment_method))
 
         session["cart"] = {}
 
@@ -374,7 +404,7 @@ def subscribe():
         with open(SUBSCRIPTIONS_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(json.dumps(subscription) + "\n")
 
-        notify_telegram(build_subscription_message(subscription, payment_method))
+        notify_owner(build_subscription_message(subscription, payment_method))
 
         return render_template(
             "subscription_confirmation.html",

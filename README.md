@@ -109,23 +109,28 @@ Both goal→recommendation mapping (`CALCULATOR_RECOMMENDATION_SETS`,
 products get recommended or the protein ratios. The BMR/TDEE/macro formulas
 themselves live in `calculators.js`.
 
-## Order notifications (Telegram)
+## Order notifications (Telegram and/or WhatsApp)
 
 When an order or subscription is placed, the app can send the owner an
-instant Telegram message with the full details. It is **off by default**
-and only activates when both environment variables below are set — if
-they are missing, the site works normally and simply sends nothing.
-A notification failure never blocks an order (errors are swallowed).
+instant notification with the full details. Two independent channels are
+supported and both are **off by default** — each activates only when its
+env vars are set. If none are set, the site works normally and sends
+nothing. A notification failure never blocks an order (errors are
+swallowed). Set these on the host (Railway/Render → Environment):
 
-Set these on the host (e.g. Render dashboard → Environment):
-
+**Telegram** (private, first-party):
 - `TELEGRAM_BOT_TOKEN` — from @BotFather after `/newbot`.
-- `TELEGRAM_CHAT_ID` — your personal chat id (message @userinfobot to get
-  it, or send your bot a message and read it from
-  `https://api.telegram.org/bot<token>/getUpdates`).
+- `TELEGRAM_CHAT_ID` — your chat id (message @userinfobot to get it).
 
-Implemented with the standard library (`urllib`), no extra dependency.
-See `notify_telegram()` in `app.py`.
+**WhatsApp** (via the free CallMeBot bridge — note order details pass
+through that third-party service):
+- `CALLMEBOT_APIKEY` — message the CallMeBot WhatsApp number and follow
+  its reply to get a key (see callmebot.com/whatsapp-api).
+- `WHATSAPP_PHONE` — your number in international format, e.g. `+218940000849`.
+
+Both use the standard library (`urllib`), no extra dependency. See
+`notify_telegram()`, `notify_whatsapp()`, and `notify_owner()` in `app.py`.
+`GET /health` reports `telegram_configured` / `whatsapp_configured` booleans.
 
 ## Deploy
 
