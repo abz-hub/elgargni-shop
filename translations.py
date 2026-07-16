@@ -6,6 +6,9 @@ TRANSLATIONS = {
         "nav.contact": "Contact",
         "nav.cart": "Cart",
         "nav.calculators": "Calculators",
+        "nav.menu": "Menu",
+        "nav.open_menu": "Open menu",
+        "nav.close_menu": "Close menu",
 
         "hero.eyebrow": "Sports Nutrition",
         "hero.title_line1": "Get strong with",
@@ -170,6 +173,9 @@ TRANSLATIONS = {
         "nav.contact": "تواصل معنا",
         "nav.cart": "السلة",
         "nav.calculators": "الحاسبات",
+        "nav.menu": "القائمة",
+        "nav.open_menu": "افتح القائمة",
+        "nav.close_menu": "إغلاق القائمة",
 
         "hero.eyebrow": "التغذية الرياضية",
         "hero.title_line1": "كن قويًا مع",
