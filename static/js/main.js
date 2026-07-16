@@ -302,11 +302,72 @@ function initQuickView() {
   });
 }
 
+function initNavMenu() {
+  const toggle = document.getElementById("nav-toggle");
+  const menu = document.getElementById("site-menu");
+  const overlay = document.getElementById("menu-overlay");
+  if (!toggle || !menu || !overlay) return;
+
+  const links = Array.from(menu.querySelectorAll("a"));
+  const focusables = () => [toggle, ...links];
+  let lastFocused = null;
+
+  const setState = (open) => {
+    toggle.classList.toggle("is-active", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute(
+      "aria-label",
+      open ? toggle.dataset.labelClose : toggle.dataset.labelOpen
+    );
+    menu.classList.toggle("is-open", open);
+    menu.setAttribute("aria-hidden", String(!open));
+    overlay.classList.toggle("is-open", open);
+    document.body.classList.toggle("nav-open", open);
+  };
+
+  const openMenu = () => {
+    lastFocused = document.activeElement;
+    setState(true);
+    window.setTimeout(() => links[0] && links[0].focus(), 360);
+  };
+  const closeMenu = () => {
+    setState(false);
+    if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+  };
+
+  toggle.addEventListener("click", () =>
+    menu.classList.contains("is-open") ? closeMenu() : openMenu()
+  );
+  overlay.addEventListener("click", closeMenu);
+  links.forEach((link) => link.addEventListener("click", closeMenu));
+
+  document.addEventListener("keydown", (e) => {
+    if (!menu.classList.contains("is-open")) return;
+    if (e.key === "Escape") {
+      closeMenu();
+      return;
+    }
+    if (e.key === "Tab") {
+      const items = focusables();
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initPageLoader();
   initSmoothScroll();
   initScrollReveal();
   initNavbarScrollShadow();
+  initNavMenu();
   initHeroParallax();
   initCardTilt(".product-card, .service-card");
   initButtonRipple();

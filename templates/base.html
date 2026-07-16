@@ -16,20 +16,46 @@
   <header class="navbar">
     <div class="container navbar-inner">
       <a class="brand" href="{{ url_for('index') }}">Elgargni <span>Shop</span></a>
-      <nav>
-        <a href="{{ url_for('index') }}#about">{{ t('nav.about') }}</a>
-        <a href="{{ url_for('products') }}">{{ t('nav.products') }}</a>
-        <a href="{{ url_for('calculators') }}">{{ t('nav.calculators') }}</a>
-        <a href="{{ url_for('index') }}#coaching">{{ t('nav.coaching') }}</a>
-        <a href="{{ url_for('index') }}#contact">{{ t('nav.contact') }}</a>
-        <a href="{{ url_for('cart') }}" class="cart-link">{{ t('nav.cart') }}{% if cart_count %} ({{ cart_count }}){% endif %}</a>
+      <div class="nav-actions">
         <a href="{{ url_for('set_language', lang_code='ar' if lang == 'en' else 'en') }}" class="lang-switch">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 4 6 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6-4-9s1.5-6.3 4-9z"/></svg>
           <span>{{ 'العربية' if lang == 'en' else 'English' }}</span>
         </a>
-      </nav>
+        <button
+          class="nav-toggle"
+          id="nav-toggle"
+          type="button"
+          aria-label="{{ t('nav.open_menu') }}"
+          aria-expanded="false"
+          aria-controls="site-menu"
+          data-label-open="{{ t('nav.open_menu') }}"
+          data-label-close="{{ t('nav.close_menu') }}"
+        >
+          <span class="nav-toggle-box"><span class="nav-toggle-inner"></span></span>
+        </button>
+      </div>
     </div>
   </header>
+
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <nav class="site-menu" id="site-menu" aria-hidden="true" aria-label="{{ t('nav.menu') }}">
+    <div class="site-menu-inner">
+      <p class="site-menu-eyebrow">{{ t('nav.menu') }}</p>
+      <ul class="site-menu-list">
+        <li style="--i: 0"><a href="{{ url_for('index') }}#about"><span>{{ t('nav.about') }}</span></a></li>
+        <li style="--i: 1"><a href="{{ url_for('products') }}"><span>{{ t('nav.products') }}</span></a></li>
+        <li style="--i: 2"><a href="{{ url_for('calculators') }}"><span>{{ t('nav.calculators') }}</span></a></li>
+        <li style="--i: 3"><a href="{{ url_for('index') }}#coaching"><span>{{ t('nav.coaching') }}</span></a></li>
+        <li style="--i: 4"><a href="{{ url_for('index') }}#contact"><span>{{ t('nav.contact') }}</span></a></li>
+        <li style="--i: 5">
+          <a class="site-menu-cart" href="{{ url_for('cart') }}">
+            <span>{{ t('nav.cart') }}</span>
+            {% if cart_count %}<span class="menu-cart-count">{{ cart_count }}</span>{% endif %}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
   {% block content %}{% endblock %}
 
