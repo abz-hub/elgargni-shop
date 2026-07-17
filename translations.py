@@ -37,6 +37,8 @@ TRANSLATIONS = {
         "category.vitamins-wellness.description": "Daily essentials to keep you performing at your peak, every day.",
         "category.shakers.title": "Shakers",
         "category.shakers.description": "Durable BPI shaker bottles for smooth, lump-free drinks wherever you train.",
+        "category.magnet-bags.title": "Magnet Bags",
+        "category.magnet-bags.description": "Secure magnetic gym bags that keep your bottle, phone, and essentials within easy reach.",
 
         "coaching.eyebrow": "Coaching",
         "coaching.title": "Get a plan built around you",
@@ -209,6 +211,8 @@ TRANSLATIONS = {
         "category.vitamins-wellness.description": "أساسيات يومية تحافظ على أدائك في أعلى مستوياته كل يوم.",
         "category.shakers.title": "الشيكرات",
         "category.shakers.description": "شيكرات BPI متينة لتحضير مشروبات ناعمة بدون تكتلات أينما تتمرن.",
+        "category.magnet-bags.title": "الحقائب المغناطيسية",
+        "category.magnet-bags.description": "حقائب رياضية مغناطيسية آمنة تُبقي قارورتك وهاتفك وأغراضك الأساسية في متناول يدك.",
 
         "coaching.eyebrow": "التدريب",
         "coaching.title": "احصل على خطة مصممة خصيصًا لك",

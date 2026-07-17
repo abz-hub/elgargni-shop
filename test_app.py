@@ -74,6 +74,30 @@ def test_shaker_can_be_added_to_cart():
     assert "50 LYD" in body
 
 
+def test_magnet_bags_category_lists_both_colors():
+    client = app.test_client()
+    response = client.get("/products")
+    body = response.data.decode()
+    assert 'id="magnet-bags"' in body
+    assert body.count("Magnet Bag") >= 2
+    assert "Pink" in body
+    assert "Black" in body
+    assert body.count("70 LYD") >= 2
+    assert 'src="/static/images/products/magnet-bag-pink.jpg"' in body
+    assert 'src="/static/images/products/magnet-bag-black.webp"' in body
+
+
+def test_magnet_bag_can_be_added_to_cart():
+    client = app.test_client()
+    client.post("/cart/add/19", data={"quantity": "2"})
+    response = client.get("/cart")
+    body = response.data.decode()
+    assert "Magnet Bag" in body
+    assert "Black" in body
+    assert "Qty: 2" in body
+    assert "140 LYD" in body
+
+
 def test_cart_add_and_view():
     client = app.test_client()
     client.post("/cart/add/1", data={"quantity": "2"})

@@ -254,6 +254,8 @@ function initQuickView() {
       '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7 6 4 10.5 4 14a8 8 0 0 0 16 0c0-3.5-3-8-8-12z"/></svg>',
     shakers:
       '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 2h8l1 3h-1l1.7 15.1A1.7 1.7 0 0 1 16 22H8a1.7 1.7 0 0 1-1.7-1.9L8 5H7l1-3Zm1.5 5-1.4 13h7.8L14.5 7h-5Z"/></svg>',
+    "magnet-bags":
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10v4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V2Zm2 4h6V4H9v2Zm-4 5v9h14v-9h-3v2h-2v-2h-4v2H8v-2H5Z"/></svg>',
   };
 
   const openModal = (trigger) => {

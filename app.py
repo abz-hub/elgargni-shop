@@ -29,7 +29,7 @@ SUBSCRIPTION_PLAN = {"id": "full-coaching-plan", "price": 120, "feature_keys": [
     "plan.feature.1", "plan.feature.2", "plan.feature.3", "plan.feature.4",
 ]}
 
-CATEGORIES = ["protein-recovery", "pre-workout-energy", "vitamins-wellness", "shakers"]
+CATEGORIES = ["protein-recovery", "pre-workout-energy", "vitamins-wellness", "shakers", "magnet-bags"]
 
 PRODUCTS = [
     {"id": 1, "name": "Whey HD", "flavor": "Chocolate Cookie", "size": "4.07 lbs", "price": 520, "category": "protein-recovery", "image": "whey-hd-chocolate-cookie.jpg"},
@@ -49,6 +49,8 @@ PRODUCTS = [
     {"id": 15, "name": "RoxyLean", "flavor": "Fat Burner & Thermogenic", "size": "60 capsules", "price": 290, "category": "vitamins-wellness", "image": "roxylean.webp"},
     {"id": 16, "name": "BPI Shaker", "flavor": "Blue", "size": "750 ml", "price": 25, "category": "shakers", "image": "bpi-shaker-blue.webp"},
     {"id": 17, "name": "BPI Shaker", "flavor": "Clear", "size": "750 ml", "price": 25, "category": "shakers", "image": "bpi-shaker-clear.jpg"},
+    {"id": 18, "name": "Magnet Bag", "flavor": "Pink", "size": "One size", "price": 70, "category": "magnet-bags", "image": "magnet-bag-pink.jpg"},
+    {"id": 19, "name": "Magnet Bag", "flavor": "Black", "size": "One size", "price": 70, "category": "magnet-bags", "image": "magnet-bag-black.webp"},
 ]
 PRODUCTS_BY_ID = {p["id"]: p for p in PRODUCTS}
 
