@@ -69,6 +69,43 @@ def test_cart_remove():
     assert "Your cart is empty" in response.data.decode()
 
 
+def test_cart_add_ajax_returns_json_and_drawer():
+    client = app.test_client()
+    response = client.post(
+        "/cart/add/1", data={"quantity": "2"}, headers={"X-Cart-Ajax": "1"}
+    )
+    assert response.status_code == 200
+    assert response.is_json
+    data = response.get_json()
+    assert data["count"] == 2
+    assert data["total"] == 1040
+    assert "Whey HD" in data["drawer_html"]
+    assert "cart-drawer-checkout" in data["drawer_html"]
+
+
+def test_cart_remove_ajax_returns_empty_drawer():
+    client = app.test_client()
+    client.post("/cart/add/1", data={"quantity": "1"}, headers={"X-Cart-Ajax": "1"})
+    response = client.post("/cart/remove/1", headers={"X-Cart-Ajax": "1"})
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["count"] == 0
+    assert "cart-drawer-empty" in data["drawer_html"]
+
+
+def test_cart_add_without_ajax_still_redirects():
+    client = app.test_client()
+    response = client.post("/cart/add/1", data={"quantity": "1"})
+    assert response.status_code == 302
+
+
+def test_cart_button_and_drawer_present_on_pages():
+    client = app.test_client()
+    body = client.get("/products").data.decode()
+    assert 'id="cart-button"' in body
+    assert 'id="cart-drawer"' in body
+
+
 def test_checkout_redirects_when_cart_empty():
     client = app.test_client()
     response = client.get("/checkout")

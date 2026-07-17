@@ -362,12 +362,125 @@ function initNavMenu() {
   });
 }
 
+function initCartDrawer() {
+  const button = document.getElementById("cart-button");
+  const drawer = document.getElementById("cart-drawer");
+  const overlay = document.getElementById("cart-overlay");
+  const body = document.getElementById("cart-drawer-body");
+  const badge = document.getElementById("cart-count-badge");
+  if (!drawer || !overlay || !body) return;
+
+  const navMenu = document.getElementById("site-menu");
+  const navToggle = document.getElementById("nav-toggle");
+  const navOverlay = document.getElementById("menu-overlay");
+
+  const closeNav = () => {
+    if (navMenu) navMenu.classList.remove("is-open"), navMenu.setAttribute("aria-hidden", "true");
+    if (navToggle) navToggle.classList.remove("is-active"), navToggle.setAttribute("aria-expanded", "false");
+    if (navOverlay) navOverlay.classList.remove("is-open");
+    document.body.classList.remove("nav-open");
+  };
+
+  const openCart = () => {
+    closeNav();
+    drawer.classList.add("is-open");
+    drawer.setAttribute("aria-hidden", "false");
+    overlay.classList.add("is-open");
+    document.body.classList.add("cart-open");
+    if (button) button.setAttribute("aria-expanded", "true");
+  };
+  const closeCart = () => {
+    drawer.classList.remove("is-open");
+    drawer.setAttribute("aria-hidden", "true");
+    overlay.classList.remove("is-open");
+    document.body.classList.remove("cart-open");
+    if (button) button.setAttribute("aria-expanded", "false");
+  };
+
+  const updateCart = (data) => {
+    if (badge) {
+      badge.textContent = data.count;
+      if (data.count > 0) badge.removeAttribute("hidden");
+      else badge.setAttribute("hidden", "");
+    }
+    body.innerHTML = data.drawer_html;
+  };
+
+  const pulse = () => {
+    if (!button) return;
+    button.classList.remove("pulse");
+    void button.offsetWidth;
+    button.classList.add("pulse");
+  };
+
+  const closeQuickView = () => {
+    const qv = document.getElementById("quick-view-modal");
+    if (qv && qv.classList.contains("is-open")) {
+      const closer = qv.querySelector("[data-modal-close]");
+      if (closer) closer.click();
+    }
+  };
+
+  const submitCart = async (form) => {
+    try {
+      const res = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { "X-Cart-Ajax": "1" },
+        credentials: "same-origin",
+      });
+      if (!res.ok) throw new Error("bad response");
+      return await res.json();
+    } catch (err) {
+      return null;
+    }
+  };
+
+  // Cart button opens the drawer (falls back to /cart link without JS)
+  if (button) {
+    button.addEventListener("click", (e) => {
+      e.preventDefault();
+      drawer.classList.contains("is-open") ? closeCart() : openCart();
+    });
+  }
+  overlay.addEventListener("click", closeCart);
+  if (navToggle) navToggle.addEventListener("click", closeCart);
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-cart-close]")) closeCart();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && drawer.classList.contains("is-open")) closeCart();
+  });
+
+  // Intercept add-to-cart and remove forms for instant, no-reload updates
+  document.addEventListener("submit", async (e) => {
+    const addForm = e.target.closest(".add-to-cart-form");
+    const removeForm = e.target.closest(".cart-remove-form");
+    if (!addForm && !removeForm) return;
+    e.preventDefault();
+    const form = addForm || removeForm;
+    const data = await submitCart(form);
+    if (!data) {
+      form.submit();
+      return;
+    }
+    updateCart(data);
+    if (addForm) {
+      closeQuickView();
+      pulse();
+      openCart();
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initPageLoader();
   initSmoothScroll();
   initScrollReveal();
   initNavbarScrollShadow();
   initNavMenu();
+  initCartDrawer();
   initHeroParallax();
   initCardTilt(".product-card, .service-card");
   initButtonRipple();
