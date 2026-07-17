@@ -253,6 +253,14 @@ def test_selected_coach_plan_renders_correct_name_and_price():
     assert "250 LYD" in body
     assert 'name="plan_id" value="coach-seraj-algot"' in body
 
+def test_waled_coach_plan_renders_existing_caption_and_price():
+    client = app.test_client()
+    response = client.get("/subscribe?plan_id=coach-waled-elgargni")
+    body = response.data.decode()
+    assert "Waled Elgargni" in body
+    assert "250 LYD" in body
+    assert 'name="plan_id" value="coach-waled-elgargni"' in body
+
 
 def test_selected_coach_is_saved_with_subscription(monkeypatch, tmp_path):
     subscriptions_file = tmp_path / "subscriptions.jsonl"
@@ -458,14 +466,16 @@ def test_order_notifies_both_channels_when_both_configured(monkeypatch, tmp_path
     assert "api.callmebot.com" in joined
 
 
-def test_coaching_team_renders_all_three_coaches_in_english():
+def test_coaching_team_renders_all_four_coaches_in_english():
     client = app.test_client()
     body = client.get("/").data.decode()
     assert 'id="coaches"' in body
+    assert "Waled Elgargni" in body
     assert "Mohammed Alsaid" in body
     assert "Seraj Algot" in body
     assert "Hafed Abugrin" in body
-    assert body.count("250") >= 3
+    assert body.count("250") >= 4
+    assert 'src="/static/images/coach.png"' in body
     assert 'src="/static/images/coaches/mohammed-alsaid.jpeg"' in body
     assert 'src="/static/images/coaches/seraj-algot.jpeg"' in body
     assert 'src="/static/images/coaches/hafed-abugrin.jpeg"' in body
@@ -476,6 +486,7 @@ def test_coaching_team_renders_in_arabic_rtl():
     client.get("/set-language/ar")
     body = client.get("/").data.decode()
     assert '<html lang="ar" dir="rtl">' in body
+    assert "وليد عبدالسلام القرقني" in body
     assert "محمد الصيد" in body
     assert "سراج القط" in body
     assert "حفيظ أبوقرين" in body

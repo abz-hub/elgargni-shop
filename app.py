@@ -36,6 +36,15 @@ SUBSCRIPTION_PLAN = {
 
 COACHES = [
     {
+        "id": "waled-elgargni",
+        "plan_id": "coach-waled-elgargni",
+        "name_key": "coach.name",
+        "role_key": "coach.role",
+        "bio_key": "coach.bio",
+        "image": "images/coach.png",
+        "price": 250,
+    },
+    {
         "id": "mohammed-alsaid",
         "plan_id": "coach-mohammed-alsaid",
         "name_key": "coaches.mohammed.name",
