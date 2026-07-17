@@ -68,6 +68,9 @@ TRANSLATIONS = {
         "cart.checkout": "Proceed to Checkout",
         "cart.empty": "Your cart is empty.",
         "cart.browse": "Browse Products",
+        "cart.continue": "Continue Shopping",
+        "cart.added": "Added to cart",
+        "cart.view": "View cart",
 
         "checkout.eyebrow": "Almost there",
         "checkout.title": "Checkout",
@@ -235,6 +238,9 @@ TRANSLATIONS = {
         "cart.checkout": "المتابعة إلى الدفع",
         "cart.empty": "سلتك فارغة.",
         "cart.browse": "تصفح المنتجات",
+        "cart.continue": "مواصلة التسوق",
+        "cart.added": "أُضيف إلى السلة",
+        "cart.view": "عرض السلة",
 
         "checkout.eyebrow": "على وشك الانتهاء",
         "checkout.title": "الدفع",

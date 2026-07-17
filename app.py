@@ -5,7 +5,16 @@ import urllib.request
 import uuid
 from datetime import datetime, timezone
 
-from flask import Flask, abort, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    abort,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from translations import t as translate
 
@@ -97,9 +106,14 @@ def inject_i18n():
 
 
 @app.context_processor
-def inject_cart_count():
-    cart = session.get("cart", {})
-    return {"cart_count": sum(cart.values())}
+def inject_cart():
+    items = get_cart_items()
+    return {
+        "cart_count": sum(session.get("cart", {}).values()),
+        "cart_items": items,
+        "cart_total": get_cart_total(items),
+        "currency": "LYD",
+    }
 
 
 @app.route("/set-language/<lang_code>")
@@ -134,6 +148,24 @@ def get_cart_items():
 
 def get_cart_total(items):
     return sum(item["subtotal"] for item in items)
+
+
+def _is_cart_ajax():
+    return request.headers.get("X-Cart-Ajax") == "1"
+
+
+def _cart_ajax_payload():
+    items = get_cart_items()
+    total = get_cart_total(items)
+    return jsonify(
+        {
+            "count": sum(session.get("cart", {}).values()),
+            "total": total,
+            "drawer_html": render_template(
+                "_cart_drawer.html", cart_items=items, cart_total=total, currency="LYD"
+            ),
+        }
+    )
 
 
 def notify_telegram(text):
@@ -223,8 +255,6 @@ def build_subscription_message(subscription, payment_method):
 @app.route("/health")
 def health():
     """Lightweight diagnostic — reports config presence only, never secrets."""
-    from flask import jsonify
-
     return jsonify(
         {
             "status": "ok",
@@ -271,6 +301,8 @@ def cart_add(product_id):
     key = str(product_id)
     cart[key] = cart.get(key, 0) + quantity
     session["cart"] = cart
+    if _is_cart_ajax():
+        return _cart_ajax_payload()
     return redirect(request.referrer or url_for("products"))
 
 
@@ -279,6 +311,8 @@ def cart_remove(product_id):
     cart = session.get("cart", {})
     cart.pop(str(product_id), None)
     session["cart"] = cart
+    if _is_cart_ajax():
+        return _cart_ajax_payload()
     return redirect(url_for("cart"))
 
 
