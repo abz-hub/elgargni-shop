@@ -51,6 +51,29 @@ def test_product_with_image_file_renders_photo():
     assert 'src="/static/images/products/roxylean.webp"' in body
 
 
+def test_shakers_category_lists_both_bpi_variants():
+    client = app.test_client()
+    response = client.get("/products")
+    body = response.data.decode()
+    assert 'id="shakers"' in body
+    assert body.count("BPI Shaker") >= 2
+    assert "Blue" in body
+    assert "Clear" in body
+    assert body.count("25 LYD") >= 2
+    assert 'src="/static/images/products/bpi-shaker-blue.webp"' in body
+    assert 'src="/static/images/products/bpi-shaker-clear.jpg"' in body
+
+
+def test_shaker_can_be_added_to_cart():
+    client = app.test_client()
+    client.post("/cart/add/16", data={"quantity": "2"})
+    response = client.get("/cart")
+    body = response.data.decode()
+    assert "BPI Shaker" in body
+    assert "Qty: 2" in body
+    assert "50 LYD" in body
+
+
 def test_cart_add_and_view():
     client = app.test_client()
     client.post("/cart/add/1", data={"quantity": "2"})

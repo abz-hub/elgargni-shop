@@ -35,6 +35,8 @@ TRANSLATIONS = {
         "category.pre-workout-energy.description": "Clean energy blends to help you push harder and last longer.",
         "category.vitamins-wellness.title": "Vitamins & Wellness",
         "category.vitamins-wellness.description": "Daily essentials to keep you performing at your peak, every day.",
+        "category.shakers.title": "Shakers",
+        "category.shakers.description": "Durable BPI shaker bottles for smooth, lump-free drinks wherever you train.",
 
         "coaching.eyebrow": "Coaching",
         "coaching.title": "Get a plan built around you",
@@ -205,6 +207,8 @@ TRANSLATIONS = {
         "category.pre-workout-energy.description": "خلطات طاقة نظيفة تساعدك على الأداء بجهد أكبر لفترة أطول.",
         "category.vitamins-wellness.title": "الفيتامينات والعافية",
         "category.vitamins-wellness.description": "أساسيات يومية تحافظ على أدائك في أعلى مستوياته كل يوم.",
+        "category.shakers.title": "الشيكرات",
+        "category.shakers.description": "شيكرات BPI متينة لتحضير مشروبات ناعمة بدون تكتلات أينما تتمرن.",
 
         "coaching.eyebrow": "التدريب",
         "coaching.title": "احصل على خطة مصممة خصيصًا لك",

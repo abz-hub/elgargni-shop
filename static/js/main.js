@@ -252,6 +252,8 @@ function initQuickView() {
       '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="13,2 4,14 11,14 10,22 20,10 13,10"/></svg>',
     "vitamins-wellness":
       '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7 6 4 10.5 4 14a8 8 0 0 0 16 0c0-3.5-3-8-8-12z"/></svg>',
+    shakers:
+      '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 2h8l1 3h-1l1.7 15.1A1.7 1.7 0 0 1 16 22H8a1.7 1.7 0 0 1-1.7-1.9L8 5H7l1-3Zm1.5 5-1.4 13h7.8L14.5 7h-5Z"/></svg>',
   };
 
   const openModal = (trigger) => {
