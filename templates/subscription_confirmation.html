@@ -27,7 +27,7 @@
       </div>
 
       <aside class="order-summary">
-        <h2>{{ t('plan.name') }}</h2>
+        <h2>{{ t(plan.name_key) }}</h2>
         <ul class="pricing-features pricing-features-compact">
           {% for feature_key in plan.feature_keys %}
           <li>{{ t(feature_key) }}</li>

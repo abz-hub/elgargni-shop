@@ -108,6 +108,32 @@ function initSmoothScroll() {
     };
     window.requestAnimationFrame(raf);
   }
+
+  const scrollToHash = (hash, immediate = false) => {
+    if (!hash || hash === "#") return false;
+    const target = document.getElementById(hash.slice(1));
+    if (!target) return false;
+    lenis.scrollTo(target, { offset: -88, immediate });
+    return true;
+  };
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest('a[href*="#"]');
+    if (!link) return;
+    const destination = new URL(link.href, window.location.href);
+    if (
+      destination.origin !== window.location.origin ||
+      destination.pathname !== window.location.pathname ||
+      !destination.hash
+    ) return;
+    if (!scrollToHash(destination.hash)) return;
+    event.preventDefault();
+    window.history.pushState(null, "", destination.hash);
+  });
+
+  if (window.location.hash) {
+    window.setTimeout(() => scrollToHash(window.location.hash, true), 700);
+  }
 }
 
 function initNavbarScrollShadow() {

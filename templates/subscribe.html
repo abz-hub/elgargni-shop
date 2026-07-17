@@ -13,6 +13,7 @@
   <section class="section">
     <div class="container checkout-layout">
       <form class="checkout-form" action="{{ url_for('subscribe') }}" method="post">
+        <input type="hidden" name="plan_id" value="{{ plan.id }}">
         {% if errors %}
         <div class="form-errors">
           <ul>
@@ -55,7 +56,7 @@
       </form>
 
       <aside class="order-summary">
-        <h2>{{ t('plan.name') }}</h2>
+        <h2>{{ t(plan.name_key) }}</h2>
         <ul class="pricing-features pricing-features-compact">
           {% for feature_key in plan.feature_keys %}
           <li>{{ t(feature_key) }}</li>

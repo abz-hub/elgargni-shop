@@ -25,9 +25,60 @@ PRODUCT_IMAGE_DIR = os.path.join(app.static_folder, "images", "products")
 ORDERS_LOG_PATH = os.path.join(os.path.dirname(__file__), "orders.jsonl")
 SUBSCRIPTIONS_LOG_PATH = os.path.join(os.path.dirname(__file__), "subscriptions.jsonl")
 
-SUBSCRIPTION_PLAN = {"id": "full-coaching-plan", "price": 120, "feature_keys": [
-    "plan.feature.1", "plan.feature.2", "plan.feature.3", "plan.feature.4",
-]}
+SUBSCRIPTION_PLAN = {
+    "id": "full-coaching-plan",
+    "price": 120,
+    "name_key": "plan.name",
+    "feature_keys": [
+        "plan.feature.1", "plan.feature.2", "plan.feature.3", "plan.feature.4",
+    ],
+}
+
+COACHES = [
+    {
+        "id": "mohammed-alsaid",
+        "plan_id": "coach-mohammed-alsaid",
+        "name_key": "coaches.mohammed.name",
+        "role_key": "coaches.mohammed.role",
+        "bio_key": "coaches.mohammed.bio",
+        "image": "images/coaches/mohammed-alsaid.jpeg",
+        "price": 250,
+    },
+    {
+        "id": "seraj-algot",
+        "plan_id": "coach-seraj-algot",
+        "name_key": "coaches.seraj.name",
+        "role_key": "coaches.seraj.role",
+        "bio_key": "coaches.seraj.bio",
+        "image": "images/coaches/seraj-algot.jpeg",
+        "price": 250,
+    },
+    {
+        "id": "hafed-abugrin",
+        "plan_id": "coach-hafed-abugrin",
+        "name_key": "coaches.hafed.name",
+        "role_key": "coaches.hafed.role",
+        "bio_key": "coaches.hafed.bio",
+        "image": "images/coaches/hafed-abugrin.jpeg",
+        "price": 250,
+    },
+]
+
+COACHING_PLANS = {
+    coach["plan_id"]: {
+        "id": coach["plan_id"],
+        "price": coach["price"],
+        "name_key": coach["name_key"],
+        "coach_id": coach["id"],
+        "feature_keys": [
+            "coaches.feature.diet",
+            "coaches.feature.training",
+            "coaches.feature.progress",
+        ],
+    }
+    for coach in COACHES
+}
+SUBSCRIPTION_PLANS_BY_ID = {SUBSCRIPTION_PLAN["id"]: SUBSCRIPTION_PLAN, **COACHING_PLANS}
 
 CATEGORIES = ["protein-recovery", "pre-workout-energy", "vitamins-wellness", "shakers", "magnet-bags"]
 
@@ -247,7 +298,7 @@ def build_subscription_message(subscription, payment_method):
     return "\n".join(
         [
             f"⭐ New Subscription #{subscription['subscription_id']}",
-            f"Plan: Full Coaching Plan — {subscription['price']} LYD/month",
+            f"Plan: {subscription['plan_name']} — {subscription['price']} LYD/month",
             f"Payment: {translate('payment.' + payment_method['id'] + '.label', lang='en')}",
             "",
             f"Customer: {subscription['customer']['name']}",
@@ -276,7 +327,13 @@ def health():
 
 @app.route("/")
 def index():
-    return render_template("index.html", categories=CATEGORIES, plan=SUBSCRIPTION_PLAN, currency="LYD")
+    return render_template(
+        "index.html",
+        categories=CATEGORIES,
+        plan=SUBSCRIPTION_PLAN,
+        coaches=COACHES,
+        currency="LYD",
+    )
 
 
 @app.route("/products")
@@ -407,6 +464,8 @@ def checkout():
 @app.route("/subscribe", methods=["GET", "POST"])
 def subscribe():
     lang = get_lang()
+    requested_plan_id = request.values.get("plan_id") or SUBSCRIPTION_PLAN["id"]
+    selected_plan = SUBSCRIPTION_PLANS_BY_ID.get(requested_plan_id, SUBSCRIPTION_PLAN)
 
     if request.method == "POST":
         name = (request.form.get("name") or "").strip()
@@ -424,7 +483,7 @@ def subscribe():
         if errors:
             return render_template(
                 "subscribe.html",
-                plan=SUBSCRIPTION_PLAN,
+                plan=selected_plan,
                 payment_methods=PAYMENT_METHODS,
                 currency="LYD",
                 errors=errors,
@@ -436,8 +495,10 @@ def subscribe():
             "created_at": datetime.now(timezone.utc).isoformat(),
             "customer": {"name": name, "phone": phone},
             "payment_method": payment_method["id"],
-            "plan": SUBSCRIPTION_PLAN["id"],
-            "price": SUBSCRIPTION_PLAN["price"],
+            "plan": selected_plan["id"],
+            "plan_name": translate(selected_plan["name_key"], lang="en"),
+            "coach_id": selected_plan.get("coach_id"),
+            "price": selected_plan["price"],
         }
         with open(SUBSCRIPTIONS_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(json.dumps(subscription) + "\n")
@@ -448,13 +509,13 @@ def subscribe():
             "subscription_confirmation.html",
             subscription=subscription,
             payment_method=payment_method,
-            plan=SUBSCRIPTION_PLAN,
+            plan=selected_plan,
             currency="LYD",
         )
 
     return render_template(
         "subscribe.html",
-        plan=SUBSCRIPTION_PLAN,
+        plan=selected_plan,
         payment_methods=PAYMENT_METHODS,
         currency="LYD",
         errors=[],

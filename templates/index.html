@@ -83,18 +83,40 @@
     </div>
   </section>
 
-  <section id="coach" class="section">
-    <div class="container coach-layout">
-      <div class="coach-photo reveal">
-        <img src="{{ url_for('static', filename='images/coach.png') }}" alt="{{ t('coach.name') }}" loading="lazy">
+  <section id="coaches" class="section coaches-section">
+    <div class="container">
+      <div class="coaches-heading reveal">
+        <p class="eyebrow">{{ t('coaches.eyebrow') }}</p>
+        <h2>{{ t('coaches.title') }}</h2>
+        <p>{{ t('coaches.subtitle') }}</p>
       </div>
-      <div class="coach-info">
-        <p class="eyebrow reveal">{{ t('coach.eyebrow') }}</p>
-        <h2 class="reveal">{{ t('coach.title') }}</h2>
-        <p class="coach-name reveal">{{ t('coach.name') }}</p>
-        <p class="coach-role reveal">{{ t('coach.role') }}</p>
-        <p class="reveal">{{ t('coach.bio') }}</p>
-        <a class="btn reveal" href="{{ url_for('subscribe') }}">{{ t('coach.cta') }}</a>
+      <div class="coaches-grid">
+        {% for coach in coaches %}
+        <article class="coach-card reveal" style="--coach-delay: {{ loop.index0 * 0.08 }}s">
+          <div class="coach-card-media">
+            <img src="{{ url_for('static', filename=coach.image) }}" alt="{{ t(coach.name_key) }}" width="720" height="900" loading="lazy">
+            <span class="coach-card-badge">{{ t('coaches.badge') }}</span>
+            <div class="coach-card-shade"></div>
+          </div>
+          <div class="coach-card-body">
+            <p class="coach-card-role">{{ t(coach.role_key) }}</p>
+            <h3>{{ t(coach.name_key) }}</h3>
+            <p class="coach-card-bio">{{ t(coach.bio_key) }}</p>
+            <ul class="coach-card-features">
+              <li>{{ t('coaches.feature.diet') }}</li>
+              <li>{{ t('coaches.feature.training') }}</li>
+              <li>{{ t('coaches.feature.progress') }}</li>
+            </ul>
+            <div class="coach-card-footer">
+              <p class="coach-card-price">
+                <span>{{ coach.price }}</span> {{ currency }}
+                <small>/ {{ t('plan.period') }}</small>
+              </p>
+              <a class="btn coach-card-cta" href="{{ url_for('subscribe', plan_id=coach.plan_id) }}">{{ t('coaches.cta') }}</a>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
       </div>
     </div>
   </section>

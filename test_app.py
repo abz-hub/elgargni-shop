@@ -242,6 +242,38 @@ def test_subscribe_submit_creates_subscription(monkeypatch, tmp_path):
     assert saved["payment_method"] == "cod"
     assert saved["customer"]["name"] == "Test Customer"
     assert saved["price"] == 120
+    assert saved["plan"] == "full-coaching-plan"
+
+
+def test_selected_coach_plan_renders_correct_name_and_price():
+    client = app.test_client()
+    response = client.get("/subscribe?plan_id=coach-seraj-algot")
+    body = response.data.decode()
+    assert "Seraj Algot" in body
+    assert "250 LYD" in body
+    assert 'name="plan_id" value="coach-seraj-algot"' in body
+
+
+def test_selected_coach_is_saved_with_subscription(monkeypatch, tmp_path):
+    subscriptions_file = tmp_path / "subscriptions.jsonl"
+    monkeypatch.setattr(app_module, "SUBSCRIPTIONS_LOG_PATH", str(subscriptions_file))
+
+    client = app.test_client()
+    response = client.post(
+        "/subscribe",
+        data={
+            "name": "Coach Customer",
+            "phone": "0912345678",
+            "payment_method": "cod",
+            "plan_id": "coach-hafed-abugrin",
+        },
+    )
+    assert response.status_code == 200
+    saved = json.loads(subscriptions_file.read_text().strip())
+    assert saved["plan"] == "coach-hafed-abugrin"
+    assert saved["coach_id"] == "hafed-abugrin"
+    assert saved["plan_name"] == "Hafed Abugrin"
+    assert saved["price"] == 250
 
 
 def test_subscribe_rejects_missing_name(monkeypatch, tmp_path):
@@ -426,20 +458,27 @@ def test_order_notifies_both_channels_when_both_configured(monkeypatch, tmp_path
     assert "api.callmebot.com" in joined
 
 
-def test_coach_section_renders_in_english():
+def test_coaching_team_renders_all_three_coaches_in_english():
     client = app.test_client()
     body = client.get("/").data.decode()
-    assert "Waled Elgargni" in body
-    assert "Champion bodybuilder" in body
-    assert 'src="/static/images/coach.png"' in body
+    assert 'id="coaches"' in body
+    assert "Mohammed Alsaid" in body
+    assert "Seraj Algot" in body
+    assert "Hafed Abugrin" in body
+    assert body.count("250") >= 3
+    assert 'src="/static/images/coaches/mohammed-alsaid.jpeg"' in body
+    assert 'src="/static/images/coaches/seraj-algot.jpeg"' in body
+    assert 'src="/static/images/coaches/hafed-abugrin.jpeg"' in body
 
 
-def test_coach_section_renders_in_arabic():
+def test_coaching_team_renders_in_arabic_rtl():
     client = app.test_client()
     client.get("/set-language/ar")
     body = client.get("/").data.decode()
-    assert "وليد عبدالسلام القرقني" in body
-    assert "بطل كمال أجسام" in body
+    assert '<html lang="ar" dir="rtl">' in body
+    assert "محمد الصيد" in body
+    assert "سراج القط" in body
+    assert "حفيظ أبوقرين" in body
 
 
 def test_whatsapp_button_renders_with_business_number():
