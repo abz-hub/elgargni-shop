@@ -582,6 +582,27 @@ def test_calculators_nav_link_present():
     assert "Calculators" in body
 
 
+def test_homepage_calculator_showcase_is_professional_and_linked():
+    client = app.test_client()
+    body = client.get("/").data.decode()
+    assert 'id="home-calculators"' in body
+    assert "Calculate your calories &amp; macros" in body
+    assert "Daily calorie target" in body
+    assert "Personalized macros" in body
+    assert "Calculate My Calories" in body
+    assert 'class="calculator-preview-ring"' in body
+    assert 'href="/calculators"' in body
+
+
+def test_homepage_calculator_showcase_is_translated_to_arabic():
+    client = app.test_client()
+    client.get("/set-language/ar")
+    body = client.get("/").data.decode()
+    assert "احسب سعراتك والماكروز" in body
+    assert "احتياجك اليومي من السعرات" in body
+    assert "احسب سعراتي الآن" in body
+
+
 def test_calculators_page_in_arabic():
     client = app.test_client()
     client.get("/set-language/ar")

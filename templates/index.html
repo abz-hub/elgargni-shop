@@ -83,6 +83,66 @@
     </div>
   </section>
 
+  <section id="home-calculators" class="section calculator-showcase-section">
+    <div class="container calculator-showcase">
+      <div class="calculator-showcase-copy reveal">
+        <p class="eyebrow">{{ t('home_calculator.eyebrow') }}</p>
+        <h2>{{ t('home_calculator.title') }}</h2>
+        <p class="calculator-showcase-lead">{{ t('home_calculator.subtitle') }}</p>
+        <div class="calculator-benefits">
+          <div class="calculator-benefit">
+            <span class="calculator-benefit-icon" aria-hidden="true">01</span>
+            <div><strong>{{ t('home_calculator.benefit.calories') }}</strong><small>{{ t('home_calculator.benefit.calories_desc') }}</small></div>
+          </div>
+          <div class="calculator-benefit">
+            <span class="calculator-benefit-icon" aria-hidden="true">02</span>
+            <div><strong>{{ t('home_calculator.benefit.macros') }}</strong><small>{{ t('home_calculator.benefit.macros_desc') }}</small></div>
+          </div>
+          <div class="calculator-benefit">
+            <span class="calculator-benefit-icon" aria-hidden="true">03</span>
+            <div><strong>{{ t('home_calculator.benefit.goal') }}</strong><small>{{ t('home_calculator.benefit.goal_desc') }}</small></div>
+          </div>
+        </div>
+        <a class="btn calculator-showcase-cta" href="{{ url_for('calculators') }}">{{ t('home_calculator.cta') }}</a>
+        <p class="calculator-showcase-note">{{ t('home_calculator.note') }}</p>
+      </div>
+
+      <div class="calculator-preview reveal" aria-label="{{ t('home_calculator.preview_label') }}">
+        <div class="calculator-preview-glow" aria-hidden="true"></div>
+        <div class="calculator-preview-top">
+          <div>
+            <span class="calculator-preview-kicker">{{ t('home_calculator.preview') }}</span>
+            <h3>{{ t('home_calculator.daily_target') }}</h3>
+          </div>
+          <span class="calculator-preview-status"><i></i>{{ t('home_calculator.ready') }}</span>
+        </div>
+        <div class="calculator-preview-main">
+          <div class="calculator-preview-ring" aria-hidden="true">
+            <div class="calculator-preview-ring-inner">
+              <strong>2,450</strong>
+              <span>{{ t('home_calculator.kcal') }}</span>
+            </div>
+          </div>
+          <div class="calculator-preview-summary">
+            <span>{{ t('home_calculator.example_goal') }}</span>
+            <strong>{{ t('calculators.goal_muscle') }}</strong>
+            <div class="calculator-preview-progress"><i></i></div>
+            <small>{{ t('home_calculator.balanced') }}</small>
+          </div>
+        </div>
+        <div class="calculator-preview-macros">
+          <div class="calculator-preview-macro macro-protein"><i></i><span>{{ t('calculators.protein') }}</span><strong>180g</strong><small>29%</small></div>
+          <div class="calculator-preview-macro macro-carbs"><i></i><span>{{ t('calculators.carbs') }}</span><strong>280g</strong><small>46%</small></div>
+          <div class="calculator-preview-macro macro-fats"><i></i><span>{{ t('calculators.fats') }}</span><strong>70g</strong><small>25%</small></div>
+        </div>
+        <div class="calculator-preview-footer">
+          <span>{{ t('home_calculator.personalized') }}</span>
+          <span class="calculator-preview-arrow" aria-hidden="true">↗</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="coaches" class="section coaches-section">
     <div class="container">
       <div class="coaches-heading reveal">
