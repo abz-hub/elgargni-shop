@@ -258,7 +258,8 @@ CATALOG:\n{catalog}"""
     input_items.append({"role": "user", "content": message})
     payload = json.dumps({
         "model": OPENAI_MODEL, "instructions": instructions,
-        "input": input_items, "max_output_tokens": 450,
+        "input": input_items, "max_output_tokens": 800,
+        "reasoning": {"effort": "low"},
     }).encode("utf-8")
     api_request = urllib.request.Request(
         OPENAI_API_URL, data=payload,
