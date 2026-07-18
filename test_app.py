@@ -19,6 +19,41 @@ def test_index_contains_brand_and_services():
     assert "Protein" in body
     assert "Recovery" in body
 
+def test_homepage_has_official_arabic_search_metadata():
+    client = app.test_client()
+    body = client.get("/").data.decode()
+    assert "<title>القرقني للمكملات الغذائية | الموقع الرسمي</title>" in body
+    assert 'name="description"' in body
+    assert "الموقع الرسمي لمتجر القرقني للمكملات الغذائية" in body
+    assert '<link rel="canonical" href="https://elgargnishop.store/">' in body
+    assert 'rel="icon" type="image/png" href="/static/images/logo.png"' in body
+    assert 'property="og:title" content="القرقني للمكملات الغذائية | الموقع الرسمي"' in body
+    assert '"@type": "OnlineStore"' in body
+    assert '"name": "القرقني للمكملات الغذائية"' in body
+
+
+def test_robots_txt_allows_indexing_and_links_sitemap():
+    client = app.test_client()
+    response = client.get("/robots.txt")
+    body = response.data.decode()
+    assert response.status_code == 200
+    assert response.mimetype == "text/plain"
+    assert "User-agent: *" in body
+    assert "Allow: /" in body
+    assert "Sitemap: https://elgargnishop.store/sitemap.xml" in body
+
+
+def test_sitemap_lists_public_pages():
+    client = app.test_client()
+    response = client.get("/sitemap.xml")
+    body = response.data.decode()
+    assert response.status_code == 200
+    assert response.mimetype == "application/xml"
+    assert "https://elgargnishop.store/</loc>" in body
+    assert "https://elgargnishop.store/products</loc>" in body
+    assert "https://elgargnishop.store/calculators</loc>" in body
+    assert "https://elgargnishop.store/subscribe</loc>" in body
+
 
 def test_products_returns_ok():
     client = app.test_client()

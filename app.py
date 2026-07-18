@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 from flask import (
     Flask,
+    Response,
     abort,
     jsonify,
     redirect,
@@ -24,6 +25,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-producti
 PRODUCT_IMAGE_DIR = os.path.join(app.static_folder, "images", "products")
 ORDERS_LOG_PATH = os.path.join(os.path.dirname(__file__), "orders.jsonl")
 SUBSCRIPTIONS_LOG_PATH = os.path.join(os.path.dirname(__file__), "subscriptions.jsonl")
+PUBLIC_SITE_URL = os.environ.get("PUBLIC_SITE_URL", "https://elgargnishop.store").rstrip("/")
 
 SUBSCRIPTION_PLAN = {
     "id": "full-coaching-plan",
@@ -314,6 +316,39 @@ def build_subscription_message(subscription, payment_method):
             f"Phone: {subscription['customer']['phone']}",
         ]
     )
+
+
+@app.route("/robots.txt")
+def robots_txt():
+    return Response(
+        f"User-agent: *\nAllow: /\n\nSitemap: {PUBLIC_SITE_URL}/sitemap.xml\n",
+        mimetype="text/plain",
+    )
+
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    pages = [
+        ("/", "1.0", "weekly"),
+        ("/products", "0.9", "weekly"),
+        ("/calculators", "0.8", "monthly"),
+        ("/subscribe", "0.7", "monthly"),
+    ]
+    entries = "\n".join(
+        "    <url>"
+        f"<loc>{PUBLIC_SITE_URL}{path}</loc>"
+        f"<changefreq>{changefreq}</changefreq>"
+        f"<priority>{priority}</priority>"
+        "</url>"
+        for path, priority, changefreq in pages
+    )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{entries}\n"
+        "</urlset>\n"
+    )
+    return Response(xml, mimetype="application/xml")
 
 
 @app.route("/health")

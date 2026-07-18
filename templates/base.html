@@ -3,7 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Elgargni Shop{% endblock %}</title>
+  <title>{% block title %}القرقني للمكملات الغذائية | الموقع الرسمي{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}الموقع الرسمي لمتجر القرقني للمكملات الغذائية في ليبيا. بروتين، كرياتين، مكملات رياضية، شيكرات، حقائب مغناطيسية، حاسبة سعرات وخطط تدريب وتغذية.{% endblock %}">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <link rel="canonical" href="{% block canonical_url %}{{ request.base_url }}{% endblock %}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/logo.png') }}">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="القرقني للمكملات الغذائية">
+  <meta property="og:title" content="القرقني للمكملات الغذائية | الموقع الرسمي">
+  <meta property="og:description" content="متجر القرقني الرسمي للمكملات الغذائية والرياضية وخطط التدريب والتغذية في ليبيا.">
+  <meta property="og:url" content="{{ request.base_url }}">
+  <meta property="og:image" content="https://elgargnishop.store/static/images/logo.png">
+  <meta property="og:image:alt" content="شعار القرقني للمكملات الغذائية">
+  <meta property="og:locale" content="{{ 'ar_LY' if lang == 'ar' else 'en_US' }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="القرقني للمكملات الغذائية | الموقع الرسمي">
+  <meta name="twitter:description" content="الموقع الرسمي لمتجر القرقني للمكملات الغذائية والرياضية في ليبيا.">
+  <meta name="twitter:image" content="https://elgargnishop.store/static/images/logo.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "OnlineStore",
+    "@id": "https://elgargnishop.store/#store",
+    "name": "القرقني للمكملات الغذائية",
+    "alternateName": ["Elgargni Shop", "القرقني شوب"],
+    "url": "https://elgargnishop.store/",
+    "logo": "https://elgargnishop.store/static/images/logo.png",
+    "image": "https://elgargnishop.store/static/images/logo.png",
+    "description": "الموقع الرسمي لمتجر القرقني للمكملات الغذائية والرياضية وخطط التدريب والتغذية في ليبيا.",
+    "email": "elgargni.shop@outlook.com",
+    "telephone": "+218940000849",
+    "currenciesAccepted": "LYD",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Libya"
+    }
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
