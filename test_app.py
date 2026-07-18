@@ -11,6 +11,42 @@ def test_index_returns_ok():
     assert response.status_code == 200
 
 
+def test_ai_chat_widget_is_present():
+    body = app.test_client().get("/").data.decode()
+    assert 'id="ai-chat-launcher"' in body
+    assert 'id="ai-chat-panel"' in body
+    assert 'id="ai-chat-form"' in body
+
+
+def test_ai_chat_requires_message():
+    response = app.test_client().post("/api/ai-chat", json={})
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "message_required"
+
+
+def test_ai_chat_reports_missing_configuration(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    response = app.test_client().post("/api/ai-chat", json={"message": "protein"})
+    assert response.status_code == 503
+    assert response.get_json()["error"] == "not_configured"
+
+
+def test_ai_chat_returns_safe_catalog_products(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(
+        app_module, "_openai_store_reply",
+        lambda message, history, lang: "Try Whey HD",
+    )
+    response = app.test_client().post(
+        "/api/ai-chat", json={"message": "I need protein"}
+    )
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["reply"] == "Try Whey HD"
+    assert data["products"][0]["id"] == 1
+    assert data["products"][0]["add_url"] == "/cart/add/1"
+
+
 def test_index_contains_brand_and_services():
     client = app.test_client()
     response = client.get("/")

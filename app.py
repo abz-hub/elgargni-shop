@@ -26,6 +26,8 @@ PRODUCT_IMAGE_DIR = os.path.join(app.static_folder, "images", "products")
 ORDERS_LOG_PATH = os.path.join(os.path.dirname(__file__), "orders.jsonl")
 SUBSCRIPTIONS_LOG_PATH = os.path.join(os.path.dirname(__file__), "subscriptions.jsonl")
 PUBLIC_SITE_URL = os.environ.get("PUBLIC_SITE_URL", "https://elgargnishop.store").rstrip("/")
+OPENAI_API_URL = "https://api.openai.com/v1/responses"
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5-mini")
 
 SUBSCRIPTION_PLAN = {
     "id": "full-coaching-plan",
@@ -216,6 +218,63 @@ def get_cart_total(items):
     return sum(item["subtotal"] for item in items)
 
 
+def _chat_product_matches(message):
+    """Return relevant products without trusting model-generated product IDs."""
+    text = message.casefold()
+    category = None
+    if any(word in text for word in ("protein", "whey", "iso", "بروتين", "واي", "عضل")):
+        category = "protein-recovery"
+    elif any(word in text for word in ("creatine", "كرياتين", "performance", "أداء")):
+        return [PRODUCTS_BY_ID[8]]
+    elif any(word in text for word in ("weight", "cut", "حرق", "تنشيف", "خسارة", "كارنتين")):
+        category = "vitamins-wellness"
+    elif any(word in text for word in ("shaker", "شيكر")):
+        category = "shakers"
+    elif any(word in text for word in ("bag", "حقيبة", "شنطة")):
+        category = "magnet-bags"
+    if not category:
+        return []
+    return [product for product in PRODUCTS if product["category"] == category][:3]
+
+
+def _openai_store_reply(message, history, lang):
+    catalog = "\n".join(
+        f"- ID {p['id']}: {p['name']} — {p['flavor']} — {p['size']} — {p['price']} LYD"
+        for p in PRODUCTS
+    )
+    instructions = f"""You are the official shopping assistant for ELGARGNI SHOP, a Libyan supplements store.
+Reply in {'Arabic' if lang == 'ar' else 'English'}, matching the customer's language when obvious.
+Be concise, friendly, and helpful. Use only the catalog below; never invent stock, prices, ingredients, delivery times, or medical claims.
+For health conditions, pregnancy, medicines, allergies, or users under 18, advise speaking with a doctor or qualified dietitian before supplements.
+Do not diagnose or promise results. Creatine guidance may mention 5 g daily; otherwise advise following the product label.
+Monthly coaching plans shown on the site cost 250 LYD. If a product fits, state its exact name and price. Prices are Libyan dinars.
+CATALOG:\n{catalog}"""
+    input_items = []
+    for item in history[-8:]:
+        role = item.get("role")
+        content = str(item.get("content", "")).strip()[:800]
+        if role in ("user", "assistant") and content:
+            input_items.append({"role": role, "content": content})
+    input_items.append({"role": "user", "content": message})
+    payload = json.dumps({
+        "model": OPENAI_MODEL, "instructions": instructions,
+        "input": input_items, "max_output_tokens": 450,
+    }).encode("utf-8")
+    api_request = urllib.request.Request(
+        OPENAI_API_URL, data=payload,
+        headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(api_request, timeout=25) as response:
+        data = json.loads(response.read().decode("utf-8"))
+    if data.get("output_text"):
+        return data["output_text"].strip()
+    parts = [content["text"] for output in data.get("output", []) for content in output.get("content", []) if content.get("type") == "output_text" and content.get("text")]
+    if not parts:
+        raise ValueError("OpenAI response did not contain text")
+    return "\n".join(parts).strip()
+
+
 def _is_cart_ajax():
     return request.headers.get("X-Cart-Ajax") == "1"
 
@@ -365,8 +424,46 @@ def health():
                 os.environ.get("CALLMEBOT_APIKEY")
                 and os.environ.get("WHATSAPP_PHONE")
             ),
+            "ai_chat_configured": bool(os.environ.get("OPENAI_API_KEY")),
         }
     )
+
+
+@app.route("/api/ai-chat", methods=["POST"])
+def ai_chat():
+    data = request.get_json(silent=True) or {}
+    message = str(data.get("message", "")).strip()
+    history = data.get("history") if isinstance(data.get("history"), list) else []
+    if not message:
+        return jsonify({"error": "message_required"}), 400
+    if len(message) > 800:
+        return jsonify({"error": "message_too_long"}), 400
+    if not os.environ.get("OPENAI_API_KEY"):
+        return jsonify({"error": "not_configured"}), 503
+    now = int(datetime.now(timezone.utc).timestamp())
+    window_start = int(session.get("ai_chat_window_start", now))
+    count = int(session.get("ai_chat_count", 0))
+    if now - window_start >= 300:
+        window_start, count = now, 0
+    if count >= 15:
+        return jsonify({"error": "rate_limited"}), 429
+    session["ai_chat_window_start"] = window_start
+    session["ai_chat_count"] = count + 1
+    try:
+        reply = _openai_store_reply(message, history, get_lang())
+    except Exception as exc:
+        app.logger.warning("AI chat request failed: %s", exc)
+        return jsonify({"error": "temporarily_unavailable"}), 502
+    products = [
+        {
+            "id": product["id"], "name": product["name"],
+            "flavor": product["flavor"], "price": product["price"],
+            "image": url_for("static", filename=product_image_url(product)) if product_image_url(product) else None,
+            "add_url": url_for("cart_add", product_id=product["id"]),
+        }
+        for product in _chat_product_matches(message)
+    ]
+    return jsonify({"reply": reply, "products": products})
 
 
 @app.route("/")

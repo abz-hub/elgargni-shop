@@ -151,6 +151,33 @@
     </svg>
   </a>
 
+  <button class="ai-chat-launcher" id="ai-chat-launcher" type="button"
+          aria-label="{{ 'افتح مساعد التسوق الذكي' if lang == 'ar' else 'Open AI shopping assistant' }}"
+          aria-controls="ai-chat-panel" aria-expanded="false">
+    <span class="ai-chat-launcher-pulse" aria-hidden="true"></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 15a4 4 0 0 1-4 4H8l-5 3 1.6-4.8A7 7 0 0 1 3 13V8a4 4 0 0 1 4-4h9a4 4 0 0 1 4 4z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>
+    <span>{{ 'اسأل القرقني' if lang == 'ar' else 'Ask Elgargni' }}</span>
+  </button>
+  <section class="ai-chat-panel" id="ai-chat-panel" aria-hidden="true" aria-label="{{ 'مساعد القرقني الذكي' if lang == 'ar' else 'Elgargni AI assistant' }}">
+    <header class="ai-chat-head">
+      <div class="ai-chat-identity"><img src="{{ url_for('static', filename='images/logo.webp') }}" width="42" height="42" alt=""><div><strong>{{ 'مساعد القرقني' if lang == 'ar' else 'Elgargni Assistant' }}</strong><small><i></i>{{ 'متاح لمساعدتك' if lang == 'ar' else 'Ready to help' }}</small></div></div>
+      <button type="button" class="ai-chat-close" id="ai-chat-close" aria-label="{{ 'إغلاق المحادثة' if lang == 'ar' else 'Close chat' }}">×</button>
+    </header>
+    <div class="ai-chat-messages" id="ai-chat-messages" aria-live="polite">
+      <div class="ai-message ai-message-assistant">{{ 'مرحباً! أنا مساعد القرقني الذكي. أخبرني عن هدفك وسأساعدك في اختيار المنتج المناسب.' if lang == 'ar' else "Hi! I’m Elgargni’s shopping assistant. Tell me your goal and I’ll help you choose the right product." }}</div>
+    </div>
+    <div class="ai-chat-suggestions" id="ai-chat-suggestions">
+      <button type="button">{{ 'أريد زيادة العضلات' if lang == 'ar' else 'I want to gain muscle' }}</button>
+      <button type="button">{{ 'منتج للتنشيف' if lang == 'ar' else 'Products for cutting' }}</button>
+    </div>
+    <form class="ai-chat-form" id="ai-chat-form">
+      <label class="sr-only" for="ai-chat-input">{{ 'اكتب سؤالك' if lang == 'ar' else 'Type your question' }}</label>
+      <textarea id="ai-chat-input" rows="1" maxlength="800" placeholder="{{ 'اسأل عن المنتجات أو الأسعار...' if lang == 'ar' else 'Ask about products or prices...' }}" required></textarea>
+      <button type="submit" aria-label="{{ 'إرسال' if lang == 'ar' else 'Send' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4z"/></svg></button>
+    </form>
+    <p class="ai-chat-disclaimer">{{ 'إرشاد عام فقط، وليس بديلاً عن الاستشارة الطبية.' if lang == 'ar' else 'General guidance only; not medical advice.' }}</p>
+  </section>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>

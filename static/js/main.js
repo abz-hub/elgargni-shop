@@ -504,6 +504,90 @@ function initCartDrawer() {
   });
 }
 
+function initAiChat() {
+  const launcher = document.getElementById("ai-chat-launcher");
+  const panel = document.getElementById("ai-chat-panel");
+  const close = document.getElementById("ai-chat-close");
+  const form = document.getElementById("ai-chat-form");
+  const input = document.getElementById("ai-chat-input");
+  const messages = document.getElementById("ai-chat-messages");
+  const suggestions = document.getElementById("ai-chat-suggestions");
+  if (!launcher || !panel || !form || !input || !messages) return;
+  const isArabic = document.documentElement.lang === "ar";
+  const history = [];
+  const setOpen = (open) => {
+    panel.classList.toggle("is-open", open);
+    panel.setAttribute("aria-hidden", String(!open));
+    launcher.setAttribute("aria-expanded", String(open));
+    if (open) setTimeout(() => input.focus(), 220);
+  };
+  const addMessage = (text, role) => {
+    const item = document.createElement("div");
+    item.className = `ai-message ai-message-${role}`;
+    item.textContent = text;
+    messages.appendChild(item);
+    messages.scrollTop = messages.scrollHeight;
+    return item;
+  };
+  const addProducts = (products) => {
+    if (!products || !products.length) return;
+    const grid = document.createElement("div");
+    grid.className = "ai-chat-products";
+    products.forEach((product) => {
+      const card = document.createElement("article");
+      card.className = "ai-chat-product";
+      if (product.image) {
+        const image = document.createElement("img");
+        image.src = product.image; image.alt = product.name; image.width = 54; image.height = 54;
+        card.appendChild(image);
+      }
+      const info = document.createElement("div");
+      const name = document.createElement("strong"); name.textContent = product.name;
+      const price = document.createElement("small"); price.textContent = `${product.price} LYD`;
+      info.append(name, price);
+      const button = document.createElement("button");
+      button.type = "button"; button.textContent = isArabic ? "أضف للسلة" : "Add to cart";
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        const body = new FormData(); body.append("quantity", "1");
+        const response = await fetch(product.add_url, {method:"POST", body, headers:{"X-Cart-Ajax":"1"}, credentials:"same-origin"});
+        if (response.ok) window.location.href = "/cart";
+        else button.disabled = false;
+      });
+      card.append(info, button); grid.appendChild(card);
+    });
+    messages.appendChild(grid); messages.scrollTop = messages.scrollHeight;
+  };
+  const send = async (text) => {
+    if (!text.trim()) return;
+    addMessage(text.trim(), "user");
+    history.push({role:"user", content:text.trim()});
+    input.value = ""; input.style.height = "auto";
+    if (suggestions) suggestions.hidden = true;
+    const typing = addMessage(isArabic ? "يكتب الآن…" : "Typing…", "typing");
+    try {
+      const response = await fetch("/api/ai-chat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message:text.trim(), history:history.slice(-8)})});
+      const data = await response.json(); typing.remove();
+      if (!response.ok) {
+        const errors = {not_configured: isArabic ? "المساعد قيد التجهيز حالياً. تواصل معنا عبر واتساب وسنساعدك فوراً." : "The assistant is being configured. Please contact us on WhatsApp.", rate_limited: isArabic ? "أرسلت رسائل كثيرة. حاول بعد بضع دقائق." : "Too many messages. Please try again in a few minutes."};
+        addMessage(errors[data.error] || (isArabic ? "تعذر الرد الآن. حاول مرة أخرى." : "I couldn’t reply right now. Please try again."), "assistant");
+        return;
+      }
+      addMessage(data.reply, "assistant"); history.push({role:"assistant", content:data.reply});
+      addProducts(data.products);
+    } catch (error) {
+      typing.remove(); addMessage(isArabic ? "تعذر الاتصال. تحقق من الإنترنت وحاول مجدداً." : "Connection failed. Please try again.", "assistant");
+    }
+  };
+  launcher.addEventListener("click", () => setOpen(!panel.classList.contains("is-open")));
+  close.addEventListener("click", () => setOpen(false));
+  form.addEventListener("submit", (event) => { event.preventDefault(); send(input.value); });
+  input.addEventListener("keydown", (event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
+  input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = `${Math.min(input.scrollHeight, 110)}px`; });
+  if (suggestions) suggestions.addEventListener("click", (event) => { const button = event.target.closest("button"); if (button) send(button.textContent); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape" && panel.classList.contains("is-open")) setOpen(false); });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initPageLoader();
   initSmoothScroll();
@@ -516,4 +600,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initButtonRipple();
   initCounters();
   initQuickView();
+  initAiChat();
 });
