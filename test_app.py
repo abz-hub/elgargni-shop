@@ -645,6 +645,18 @@ def test_calculators_recommendation_add_to_cart_links_are_real():
     assert 'action="/cart/add/11"' in body
 
 
+def test_calculators_include_professional_body_scan():
+    body = app.test_client().get("/calculators").data.decode()
+    assert 'data-tab="bodyscan"' in body
+    assert 'id="panel-bodyscan"' in body
+    assert 'id="body-waist"' in body
+    assert 'id="body-neck"' in body
+    assert 'id="body-fat-percent"' in body
+    assert 'id="body-muscle-mass"' in body
+    assert 'id="body-water"' in body
+    assert 'id="body-score-ring"' in body
+
+
 def test_calculators_nav_link_present():
     client = app.test_client()
     response = client.get("/")

@@ -11,6 +11,74 @@ document.addEventListener("DOMContentLoaded", () => {
   const carbsEl = document.getElementById("calc-carbs");
   const fatsEl = document.getElementById("calc-fats");
   const donutEl = document.getElementById("macro-donut");
+  const isArabic = document.documentElement.lang === "ar";
+  let lastBodyScan = null;
+
+  function bodyFatCategory(percent, gender) {
+    const levels = gender === "male" ? [6, 14, 18, 25] : [14, 21, 25, 32];
+    if (percent < levels[0]) return isArabic ? "منخفض جدًا" : "Very low";
+    if (percent < levels[1]) return isArabic ? "رياضي" : "Athletic";
+    if (percent < levels[2]) return isArabic ? "ممتاز" : "Fitness";
+    if (percent < levels[3]) return isArabic ? "متوسط" : "Average";
+    return isArabic ? "مرتفع" : "High";
+  }
+
+  function bmiCategory(bmi) {
+    if (bmi < 18.5) return isArabic ? "أقل من الطبيعي" : "Underweight";
+    if (bmi < 25) return isArabic ? "طبيعي" : "Normal";
+    if (bmi < 30) return isArabic ? "زائد" : "Overweight";
+    return isArabic ? "مرتفع" : "High";
+  }
+
+  function setBodyValue(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  }
+
+  function runBodyScan() {
+    const gender = form.querySelector('input[name="gender"]:checked').value;
+    const age = Number(document.getElementById("calc-age").value);
+    const weight = Number(document.getElementById("calc-weight").value);
+    const height = Number(document.getElementById("calc-height").value);
+    const waist = Number(document.getElementById("body-waist").value);
+    const neck = Number(document.getElementById("body-neck").value);
+    const hip = Number(document.getElementById("body-hip").value);
+    if (!age || !weight || !height || !waist || !neck || waist <= neck || (gender === "female" && !hip)) return;
+    const denominator = gender === "male"
+      ? 1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)
+      : 1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.221 * Math.log10(height);
+    const bodyFat = Math.max(3, Math.min(55, 495 / denominator - 450));
+    const fatMass = weight * bodyFat / 100;
+    const leanMass = weight - fatMass;
+    const muscleFactor = gender === "male" ? 0.52 : 0.46;
+    const muscleMass = leanMass * muscleFactor;
+    const water = leanMass * 0.73;
+    const bmi = weight / Math.pow(height / 100, 2);
+    const bmr = gender === "male" ? 10 * weight + 6.25 * height - 5 * age + 5 : 10 * weight + 6.25 * height - 5 * age - 161;
+    const whtr = waist / height;
+    const idealBf = gender === "male" ? 15 : 23;
+    const score = Math.round(Math.max(55, Math.min(98, 92 - Math.abs(bodyFat - idealBf) * 1.15 - Math.abs(bmi - 22) * 1.1)));
+    const protein = Math.round(weight * 2);
+    lastBodyScan = {bodyFat, fatMass, leanMass, muscleMass, water, bmi, bmr, whtr, score, protein, weight};
+    const progress = document.getElementById("bodyscan-progress");
+    const report = document.getElementById("bodyscan-report");
+    progress.hidden = false; report.hidden = true;
+    document.getElementById("bodyscan-run").disabled = true;
+    window.setTimeout(() => {
+      setBodyValue("body-weight", weight.toFixed(1)); setBodyValue("body-fat-mass", fatMass.toFixed(1));
+      setBodyValue("body-lean-mass", leanMass.toFixed(1)); setBodyValue("body-muscle-mass", muscleMass.toFixed(1));
+      setBodyValue("body-water", water.toFixed(1)); setBodyValue("body-bmi", bmi.toFixed(1));
+      setBodyValue("body-fat-percent", bodyFat.toFixed(1)); setBodyValue("body-bmr", Math.round(bmr).toLocaleString());
+      setBodyValue("body-protein", protein); setBodyValue("body-score", score); setBodyValue("body-whtr", whtr.toFixed(2));
+      setBodyValue("body-bmi-label", bmiCategory(bmi)); setBodyValue("body-fat-label", bodyFatCategory(bodyFat, gender));
+      setBodyValue("body-status", score >= 85 ? (isArabic ? "تركيب جسم ممتاز" : "Excellent composition") : score >= 70 ? (isArabic ? "تركيب جسم متوازن" : "Balanced composition") : (isArabic ? "قابل للتحسين" : "Room to improve"));
+      document.getElementById("body-score-ring").style.setProperty("--score", `${score * 3.6}deg`);
+      document.getElementById("body-whtr-marker").style.left = `${Math.max(3, Math.min(97, (whtr - .35) / .35 * 100))}%`;
+      [["bar-weight", weight / 1.4], ["bar-fat", bodyFat * 2], ["bar-lean", leanMass], ["bar-muscle", muscleMass * 1.8], ["bar-water", water * 1.5]].forEach(([id, width]) => document.getElementById(id).style.width = `${Math.min(100, width)}%`);
+      progress.hidden = true; report.hidden = false; document.getElementById("bodyscan-run").disabled = false;
+      report.scrollIntoView({behavior:"smooth", block:"start"});
+    }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 1600);
+  }
 
   function renderDonut(proteinKcal, carbKcal, fatKcal) {
     const total = proteinKcal + carbKcal + fatKcal;
@@ -116,6 +184,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   form.addEventListener("submit", calculate);
+  const bodyRun = document.getElementById("bodyscan-run");
+  if (bodyRun) bodyRun.addEventListener("click", runBodyScan);
+  form.querySelectorAll('input[name="gender"]').forEach((radio) => radio.addEventListener("change", () => {
+    document.getElementById("body-hip-label").classList.toggle("is-required", radio.value === "female" && radio.checked);
+  }));
+  const bodyShare = document.getElementById("bodyscan-share");
+  if (bodyShare) bodyShare.addEventListener("click", () => {
+    if (!lastBodyScan) return;
+    const text = `ELGARGNI BodyScan — Body fat ${lastBodyScan.bodyFat.toFixed(1)}% | BMI ${lastBodyScan.bmi.toFixed(1)} | Lean mass ${lastBodyScan.leanMass.toFixed(1)} kg | Score ${lastBodyScan.score}/100`;
+    if (navigator.share) navigator.share({title:"ELGARGNI BodyScan", text}).catch(() => {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => {
+      const old = bodyShare.textContent; bodyShare.textContent = isArabic ? "تم نسخ التقرير" : "Report copied";
+      setTimeout(() => bodyShare.textContent = old, 1800);
+    });
+  });
   form.querySelectorAll("input, select").forEach((el) => {
     el.addEventListener("change", () => {
       if (hasResults()) calculate();
