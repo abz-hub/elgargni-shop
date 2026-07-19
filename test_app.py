@@ -11,6 +11,15 @@ def test_index_returns_ok():
     assert response.status_code == 200
 
 
+def test_homepage_has_k1_coming_soon_teaser():
+    body = app.test_client().get("/").data.decode()
+    assert 'class="section k1-coming-soon"' in body
+    assert "K1 PERFORMANCE" in body
+    assert "Something different is coming." in body
+    assert 'images/k1-coming-soon.png' in body
+    assert "Notify me at launch" in body
+
+
 def test_ai_chat_widget_is_present():
     body = app.test_client().get("/").data.decode()
     assert 'id="ai-chat-launcher"' in body

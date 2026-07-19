@@ -184,24 +184,34 @@
     </div>
   </section>
 
-  <section id="coaching" class="section section-alt">
+  <section id="coaching" class="section k1-coming-soon">
+    <div class="k1-ambient k1-ambient-one" aria-hidden="true"></div>
+    <div class="k1-ambient k1-ambient-two" aria-hidden="true"></div>
     <div class="container">
-      <p class="eyebrow reveal">{{ t('coaching.eyebrow') }}</p>
-      <h2 class="reveal">{{ t('coaching.title') }}</h2>
-      <p class="reveal">{{ t('coaching.subtitle') }}</p>
-      <div class="pricing-card reveal">
-        <p class="pricing-plan-name">{{ t('plan.name') }}</p>
-        <p class="pricing-price">
-          <span class="pricing-amount">{{ plan.price }}</span>
-          <span class="pricing-currency">{{ currency }}</span>
-          <span class="pricing-period">/ {{ t('plan.period') }}</span>
-        </p>
-        <ul class="pricing-features">
-          {% for feature_key in plan.feature_keys %}
-          <li>{{ t(feature_key) }}</li>
-          {% endfor %}
-        </ul>
-        <a class="btn" href="{{ url_for('subscribe') }}">{{ t('coaching.cta') }}</a>
+      <div class="k1-teaser reveal">
+        <div class="k1-visual" aria-hidden="true">
+          <img src="{{ url_for('static', filename='images/k1-coming-soon.png') }}" alt="" loading="lazy" width="1536" height="1002">
+          <div class="k1-visual-blur"></div>
+          <div class="k1-scanline"></div>
+          <span class="k1-classified">01 / 01</span>
+        </div>
+        <div class="k1-copy">
+          <div class="k1-badge"><i></i>{{ 'قريبًا' if lang == 'ar' else 'COMING SOON' }}</div>
+          <p class="k1-kicker">K1 PERFORMANCE</p>
+          <h2>{{ 'شيء مختلف قادم.' if lang == 'ar' else 'Something different is coming.' }}</h2>
+          <p class="k1-description">{{ 'علامة جديدة تجمع مكملات الأداء والملابس الرياضية في تجربة واحدة. صُممت لمن يرفضون أن يكونوا عاديين.' if lang == 'ar' else 'A new performance brand bringing supplements and athletic clothing into one experience—built for those who refuse to be average.' }}</p>
+          <div class="k1-pill-row">
+            <span>{{ 'مكملات أداء' if lang == 'ar' else 'Performance supplements' }}</span>
+            <span>{{ 'ملابس رياضية' if lang == 'ar' else 'Athletic clothing' }}</span>
+            <span>{{ 'جودة استثنائية' if lang == 'ar' else 'Premium quality' }}</span>
+          </div>
+          <div class="k1-reveal-line"><span></span><p>{{ 'استعد لتكون ضمن الـ 1٪' if lang == 'ar' else 'Prepare to be the 1%' }}</p></div>
+          <a class="k1-notify" href="https://wa.me/218940000849?text={{ ('أريد معرفة موعد إطلاق K1 Performance' if lang == 'ar' else 'Notify me when K1 Performance launches')|urlencode }}" target="_blank" rel="noopener">
+            {{ 'أخبرني عند الإطلاق' if lang == 'ar' else 'Notify me at launch' }}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <p class="k1-whisper">{{ 'التفاصيل الكاملة ستُكشف قريبًا.' if lang == 'ar' else 'Full reveal coming soon.' }}</p>
+        </div>
       </div>
     </div>
   </section>
