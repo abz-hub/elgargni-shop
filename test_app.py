@@ -664,6 +664,9 @@ def test_calculators_include_professional_body_scan():
     assert 'id="body-muscle-mass"' in body
     assert 'id="body-water"' in body
     assert 'id="body-score-ring"' in body
+    assert 'id="bodyscan-accuracy-toggle"' in body
+    assert 'id="bodyscan-advanced" hidden' in body
+    assert "Quick Scan is ready" in body
 
 
 def test_calculators_nav_link_present():

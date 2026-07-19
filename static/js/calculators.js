@@ -40,22 +40,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const age = Number(document.getElementById("calc-age").value);
     const weight = Number(document.getElementById("calc-weight").value);
     const height = Number(document.getElementById("calc-height").value);
+    const advanced = !document.getElementById("bodyscan-advanced").hidden;
     const waist = Number(document.getElementById("body-waist").value);
     const neck = Number(document.getElementById("body-neck").value);
     const hip = Number(document.getElementById("body-hip").value);
-    if (!age || !weight || !height || !waist || !neck || waist <= neck || (gender === "female" && !hip)) return;
-    const denominator = gender === "male"
-      ? 1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)
-      : 1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.221 * Math.log10(height);
-    const bodyFat = Math.max(3, Math.min(55, 495 / denominator - 450));
+    if (!age || !weight || !height) return;
+    if (advanced && (!waist || !neck || waist <= neck || (gender === "female" && !hip))) return;
+    const bmi = weight / Math.pow(height / 100, 2);
+    let bodyFat;
+    if (advanced) {
+      const denominator = gender === "male"
+        ? 1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(height)
+        : 1.29579 - 0.35004 * Math.log10(waist + hip - neck) + 0.221 * Math.log10(height);
+      bodyFat = 495 / denominator - 450;
+    } else {
+      bodyFat = 1.2 * bmi + 0.23 * age - 10.8 * (gender === "male" ? 1 : 0) - 5.4;
+    }
+    bodyFat = Math.max(3, Math.min(55, bodyFat));
     const fatMass = weight * bodyFat / 100;
     const leanMass = weight - fatMass;
     const muscleFactor = gender === "male" ? 0.52 : 0.46;
     const muscleMass = leanMass * muscleFactor;
     const water = leanMass * 0.73;
-    const bmi = weight / Math.pow(height / 100, 2);
     const bmr = gender === "male" ? 10 * weight + 6.25 * height - 5 * age + 5 : 10 * weight + 6.25 * height - 5 * age - 161;
-    const whtr = waist / height;
+    const whtr = advanced ? waist / height : Math.max(0.35, Math.min(0.7, 0.42 + (bmi - 18.5) * 0.008));
     const idealBf = gender === "male" ? 15 : 23;
     const score = Math.round(Math.max(55, Math.min(98, 92 - Math.abs(bodyFat - idealBf) * 1.15 - Math.abs(bmi - 22) * 1.1)));
     const protein = Math.round(weight * 2);
@@ -184,6 +192,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   form.addEventListener("submit", calculate);
+  const accuracyToggle = document.getElementById("bodyscan-accuracy-toggle");
+  if (accuracyToggle) accuracyToggle.addEventListener("click", () => {
+    const advanced = document.getElementById("bodyscan-advanced");
+    const willOpen = advanced.hidden;
+    advanced.hidden = !willOpen;
+    accuracyToggle.setAttribute("aria-expanded", String(willOpen));
+    accuracyToggle.classList.toggle("is-open", willOpen);
+    accuracyToggle.querySelector("span").textContent = willOpen ? "−" : "+";
+    document.querySelector("#bodyscan-run span").textContent = willOpen
+      ? (isArabic ? "ابدأ التحليل المحسّن" : "Run enhanced body scan")
+      : (isArabic ? "ابدأ التحليل السريع" : "Run quick body scan");
+  });
   const bodyRun = document.getElementById("bodyscan-run");
   if (bodyRun) bodyRun.addEventListener("click", runBodyScan);
   form.querySelectorAll('input[name="gender"]').forEach((radio) => radio.addEventListener("change", () => {

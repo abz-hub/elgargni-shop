@@ -157,14 +157,18 @@
               <div><p class="bodyscan-overline">ELGARGNI BODYSCAN</p><h2>{{ 'تحليل تركيب الجسم الاحترافي' if lang == 'ar' else 'Professional Body Composition Analysis' }}</h2></div>
               <span class="bodyscan-live"><i></i>{{ 'تحليل تقديري' if lang == 'ar' else 'ESTIMATED ANALYSIS' }}</span>
             </div>
-            <p class="bodyscan-intro">{{ 'أدخل قياساتك الدقيقة بالسنتيمتر لتحصل على تقرير شامل أقرب للواقع.' if lang == 'ar' else 'Enter accurate measurements in centimeters for a more realistic composition estimate.' }}</p>
+            <p class="bodyscan-intro">{{ 'سنستخدم الجنس والعمر والطول والوزن الذي أدخلته بالأعلى. لا تحتاج إلى أي قياسات إضافية.' if lang == 'ar' else 'We will use the gender, age, height, and weight entered above. No extra measurements are required.' }}</p>
 
-            <div class="bodyscan-measurements">
-              <label><span>{{ 'محيط الخصر' if lang == 'ar' else 'Waist' }} <b>cm</b></span><input type="number" id="body-waist" min="45" max="200" step="0.1" value="82" inputmode="decimal" required></label>
-              <label><span>{{ 'محيط الرقبة' if lang == 'ar' else 'Neck' }} <b>cm</b></span><input type="number" id="body-neck" min="20" max="80" step="0.1" value="38" inputmode="decimal" required></label>
-              <label id="body-hip-label"><span>{{ 'محيط الورك (للنساء)' if lang == 'ar' else 'Hip (women)' }} <b>cm</b></span><input type="number" id="body-hip" min="50" max="220" step="0.1" value="96" inputmode="decimal"></label>
-              <button type="button" class="btn bodyscan-run" id="bodyscan-run"><span>{{ 'ابدأ التحليل' if lang == 'ar' else 'Run body scan' }}</span><i aria-hidden="true"></i></button>
+            <div class="bodyscan-quick-ready">
+              <div><i>✓</i><span><strong>{{ 'التحليل السريع جاهز' if lang == 'ar' else 'Quick Scan is ready' }}</strong><small>{{ 'أربع معلومات فقط — نتيجة فورية' if lang == 'ar' else 'Four simple details — instant results' }}</small></span></div>
+              <button type="button" id="bodyscan-accuracy-toggle" aria-expanded="false">{{ 'تحسين دقة النتائج' if lang == 'ar' else 'Improve result accuracy' }} <span>+</span></button>
             </div>
+            <div class="bodyscan-measurements" id="bodyscan-advanced" hidden>
+              <label><span>{{ 'محيط الخصر' if lang == 'ar' else 'Waist' }} <b>cm</b></span><input type="number" id="body-waist" min="45" max="200" step="0.1" value="82" inputmode="decimal"></label>
+              <label><span>{{ 'محيط الرقبة' if lang == 'ar' else 'Neck' }} <b>cm</b></span><input type="number" id="body-neck" min="20" max="80" step="0.1" value="38" inputmode="decimal"></label>
+              <label id="body-hip-label"><span>{{ 'محيط الورك (للنساء)' if lang == 'ar' else 'Hip (women)' }} <b>cm</b></span><input type="number" id="body-hip" min="50" max="220" step="0.1" value="96" inputmode="decimal"></label>
+            </div>
+            <button type="button" class="btn bodyscan-run" id="bodyscan-run"><span>{{ 'ابدأ التحليل السريع' if lang == 'ar' else 'Run quick body scan' }}</span><i aria-hidden="true"></i></button>
 
             <div class="bodyscan-progress" id="bodyscan-progress" hidden><div class="bodyscan-progress-line"><i></i></div><strong id="bodyscan-progress-text">{{ 'جاري تحليل البيانات...' if lang == 'ar' else 'Analyzing measurements...' }}</strong></div>
 
