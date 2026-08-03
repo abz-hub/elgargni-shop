@@ -75,6 +75,15 @@ COACHES = [
         "image": "images/coaches/hafed-abugrin.jpeg",
         "price": 250,
     },
+    {
+        "id": "rida-almjrab",
+        "plan_id": "coach-rida-almjrab",
+        "name_key": "coaches.rida.name",
+        "role_key": "coaches.rida.role",
+        "bio_key": "coaches.rida.bio",
+        "image": "images/coaches/rida-almjrab.webp",
+        "price": 500,
+    },
 ]
 
 COACHING_PLANS = {
