@@ -151,6 +151,9 @@ TRANSLATIONS = {
         "coaches.hafed.name": "Hafed Abugrin",
         "coaches.hafed.role": "Bodybuilding Champion & Performance Coach",
         "coaches.hafed.bio": "A bodybuilding champion with years of experience, ideal for every athlete determined to progress.",
+        "coaches.rida.name": "Rida Almjrab",
+        "coaches.rida.role": "IFBB Pro · Champion Bodybuilder",
+        "coaches.rida.bio": "A powerhouse who competes on the international IFBB stage. Rida coaches serious athletes with championship-grade contest prep, precise nutrition, and elite muscle-building — train like a pro and bring your very best physique.",
 
         "home_calculator.eyebrow": "Performance Calculator",
         "home_calculator.title": "Calculate your calories & macros",
@@ -363,6 +366,9 @@ TRANSLATIONS = {
         "coaches.hafed.name": "حفيظ أبوقرين",
         "coaches.hafed.role": "بطل كمال أجسام ومدرب أداء",
         "coaches.hafed.bio": "بطل كمال أجسام وصاحب خبرة سنوات في المجال، مدرب مناسب لكل رياضي يريد التطور.",
+        "coaches.rida.name": "رضاء المجراب",
+        "coaches.rida.role": "محترف IFBB · بطل كمال أجسام",
+        "coaches.rida.bio": "قوة تنافس على منصات IFBB العالمية. يدرّب رضاء الرياضيين الجادين ببرامج احترافية للتجهيز للبطولات، وتغذية دقيقة، وبناء عضلي نخبوي — تدرّب باحترافية ووصّل جسمك لأفضل مستوى.",
 
         "home_calculator.eyebrow": "حاسبة الأداء",
         "home_calculator.title": "احسب سعراتك والماكروز",
