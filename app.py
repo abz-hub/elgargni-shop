@@ -46,7 +46,7 @@ COACHES = [
         "role_key": "coach.role",
         "bio_key": "coach.bio",
         "image": "images/coach.png",
-        "price": 250,
+        "price": 550,
     },
     {
         "id": "mohammed-alsaid",

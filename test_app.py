@@ -338,7 +338,7 @@ def test_waled_coach_plan_renders_existing_caption_and_price():
     response = client.get("/subscribe?plan_id=coach-waled-elgargni")
     body = response.data.decode()
     assert "Waled Elgargni" in body
-    assert "250 LYD" in body
+    assert "550 LYD" in body
     assert 'name="plan_id" value="coach-waled-elgargni"' in body
 
 
@@ -554,7 +554,8 @@ def test_coaching_team_renders_all_four_coaches_in_english():
     assert "Mohammed Alsaid" in body
     assert "Seraj Algot" in body
     assert "Hafed Abugrin" in body
-    assert body.count("250") >= 4
+    assert body.count("250") >= 3
+    assert "550" in body
     assert 'src="/static/images/coach.png"' in body
     assert 'src="/static/images/coaches/mohammed-alsaid.jpeg"' in body
     assert 'src="/static/images/coaches/seraj-algot.jpeg"' in body
