@@ -125,6 +125,17 @@ PRODUCTS = [
     {"id": 18, "name": "Magnet Bag", "flavor": "Pink", "size": "One size", "price": 70, "category": "magnet-bags", "image": "magnet-bag-pink.jpg"},
     {"id": 19, "name": "Magnet Bag", "flavor": "Black", "size": "One size", "price": 70, "category": "magnet-bags", "image": "magnet-bag-black.webp"},
 ]
+K1_PRODUCTS = [
+    {"id": 101, "name": "K1 Compression Shirt", "name_ar": "قميص K1 كومبريشن", "price": 195.75, "original_price": 217.50, "image": "k1/compression-navy.jpeg", "gallery": ["k1/compression-navy.jpeg", "k1/compression-maroon.jpeg", "k1/compression-black.jpeg", "k1/compression-white.jpeg"], "colors": ["Navy", "Maroon", "Black", "White"], "colors_ar": ["كحلي", "خمري", "أسود", "أبيض"], "sizes": ["S", "M", "L", "XL"]},
+    {"id": 102, "name": "K1 Wide Leg Jogger", "name_ar": "بنطال K1 واسع", "price": 274.05, "original_price": 304.50, "image": "k1/jacket-cream.jpeg", "gallery": ["k1/jacket-cream.jpeg", "k1/jacket-charcoal.jpeg", "k1/jacket-black.jpeg", "k1/jacket-maroon.jpeg"], "colors": ["Maroon", "Charcoal", "Black", "Cream / Off-white"], "colors_ar": ["خمري", "فحمي", "أسود", "كريمي"], "sizes": ["M", "L", "XL", "2XL"]},
+    {"id": 103, "name": "K1 Jacket", "name_ar": "جاكيت K1", "price": 313.20, "original_price": 348.00, "image": "k1/jacket-maroon.jpeg", "gallery": ["k1/jacket-maroon.jpeg", "k1/jacket-black.jpeg", "k1/jacket-charcoal.jpeg", "k1/jacket-cream.jpeg"], "colors": ["Maroon", "Charcoal", "Black", "Cream / Off-white"], "colors_ar": ["خمري", "فحمي", "أسود", "كريمي"], "sizes": ["M", "L", "XL", "2XL"]},
+    {"id": 104, "name": "K1 Workout Shorts", "name_ar": "شورت K1 رياضي", "price": 234.90, "original_price": 261.00, "image": "k1/shorts-black.jpeg", "gallery": ["k1/shorts-black.jpeg", "k1/shorts-maroon.jpeg", "k1/shorts-cream.jpeg"], "colors": ["Charcoal", "Black", "Cream / Off-white", "Dark Olive"], "colors_ar": ["فحمي", "أسود", "كريمي", "زيتوني داكن"], "sizes": ["M", "L", "XL", "2XL"]},
+    {"id": 105, "name": "K1 Kamal Oversized Shirt", "name_ar": "قميص K1 كمال أوفرسايز", "price": 234.90, "original_price": 261.00, "image": "k1/oversized-olive.jpeg", "gallery": ["k1/oversized-olive.jpeg", "k1/oversized-results.jpeg", "k1/oversized-maroon.jpeg"], "colors": ["Maroon", "Charcoal", "Black", "Cream / Off-white", "Dark Olive"], "colors_ar": ["خمري", "فحمي", "أسود", "كريمي", "زيتوني داكن"], "sizes": ["M", "L", "XL", "2XL"]},
+    {"id": 106, "name": "K1 Normal Oversized Shirt", "name_ar": "قميص K1 أوفرسايز", "price": 195.75, "original_price": 217.50, "image": "k1/oversized-results.jpeg", "gallery": ["k1/oversized-results.jpeg", "k1/oversized-maroon.jpeg", "k1/oversized-olive.jpeg"], "colors": ["Maroon", "Charcoal", "Black", "Cream / Off-white", "Dark Olive"], "colors_ar": ["خمري", "فحمي", "أسود", "كريمي", "زيتوني داكن"], "sizes": ["M", "L", "XL", "2XL"]},
+]
+for _product in K1_PRODUCTS:
+    _product.update({"flavor": "Pre-order", "size": " / ".join(_product["sizes"]), "category": "k1-clothing", "preorder": True})
+PRODUCTS.extend(K1_PRODUCTS)
 PRODUCTS_BY_ID = {p["id"]: p for p in PRODUCTS}
 
 # Supplement sets keyed by recommendation set id (goals map to one of these below)
@@ -201,6 +212,8 @@ def set_language(lang_code):
 
 
 def product_image_url(product):
+    if product.get("image", "").startswith("k1/"):
+        return f"images/{product['image']}"
     if os.path.exists(os.path.join(PRODUCT_IMAGE_DIR, product["image"])):
         return f"images/products/{product['image']}"
     return None
@@ -209,13 +222,26 @@ def product_image_url(product):
 def get_cart_items():
     cart = session.get("cart", {})
     items = []
-    for product_id_str, quantity in cart.items():
-        product = PRODUCTS_BY_ID.get(int(product_id_str))
+    for cart_key, quantity in cart.items():
+        parts = cart_key.split("|")
+        try:
+            product_id = int(parts[0])
+        except ValueError:
+            continue
+        product = PRODUCTS_BY_ID.get(product_id)
         if not product:
             continue
+        product = dict(product)
+        selected_size = urllib.parse.unquote(parts[1]) if len(parts) > 1 else ""
+        selected_color = urllib.parse.unquote(parts[2]) if len(parts) > 2 else ""
+        if selected_size or selected_color:
+            product["flavor"] = " · ".join(filter(None, [selected_color, selected_size, "Pre-order"]))
         items.append(
             {
                 "product": product,
+                "cart_key": cart_key,
+                "selected_size": selected_size,
+                "selected_color": selected_color,
                 "quantity": quantity,
                 "subtotal": product["price"] * quantity,
             }
@@ -503,6 +529,11 @@ def products():
     return render_template("products.html", grouped=grouped, currency="LYD")
 
 
+@app.route("/k1-preorder")
+def k1_preorder():
+    return render_template("k1_preorder.html", products=K1_PRODUCTS, currency="LYD")
+
+
 @app.route("/cart/add/<int:product_id>", methods=["POST"])
 def cart_add(product_id):
     if product_id not in PRODUCTS_BY_ID:
@@ -510,7 +541,14 @@ def cart_add(product_id):
     quantity = request.form.get("quantity", type=int) or 1
     quantity = max(1, quantity)
     cart = session.get("cart", {})
+    product = PRODUCTS_BY_ID[product_id]
     key = str(product_id)
+    if product.get("preorder"):
+        size = (request.form.get("size") or "").strip()
+        color = (request.form.get("color") or "").strip()
+        if size not in product["sizes"] or color not in product["colors"]:
+            abort(400)
+        key = "|".join((str(product_id), urllib.parse.quote(size, safe=""), urllib.parse.quote(color, safe="")))
     cart[key] = cart.get(key, 0) + quantity
     session["cart"] = cart
     if _is_cart_ajax():
@@ -518,7 +556,7 @@ def cart_add(product_id):
     return redirect(request.referrer or url_for("products"))
 
 
-@app.route("/cart/remove/<int:product_id>", methods=["POST"])
+@app.route("/cart/remove/<path:product_id>", methods=["POST"])
 def cart_remove(product_id):
     cart = session.get("cart", {})
     cart.pop(str(product_id), None)

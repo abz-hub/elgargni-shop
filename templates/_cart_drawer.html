@@ -7,7 +7,7 @@
       <span class="cart-drawer-item-meta">{{ item.product.flavor }} &middot; &times;{{ item.quantity }}</span>
     </div>
     <span class="cart-drawer-item-price">{{ item.subtotal }} {{ currency }}</span>
-    <form class="cart-remove-form" action="{{ url_for('cart_remove', product_id=item.product.id) }}" method="post">
+    <form class="cart-remove-form" action="{{ url_for('cart_remove', product_id=item.cart_key) }}" method="post">
       <button type="submit" class="cart-remove-btn" aria-label="{{ t('cart.remove') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>

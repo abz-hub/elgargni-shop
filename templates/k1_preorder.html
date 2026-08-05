@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ 'طلب مسبق ملابس K1 | القرقني شوب' if lang == 'ar' else 'K1 Clothing Pre-order | Elgargni Shop' }}{% endblock %}
+{% block meta_description %}{{ 'اطلب ملابس K1 Performance مسبقًا واحصل على خصم 10٪ لفترة محدودة.' if lang == 'ar' else 'Pre-order K1 Performance clothing with an exclusive 10% pre-order discount.' }}{% endblock %}
+{% block content %}
+<main class="k1-shop">
+  <section class="k1-shop-hero">
+    <div class="container reveal">
+      <p class="k1-shop-kicker">K1 PERFORMANCE · PRE-ORDER</p>
+      <h1>{{ 'ارتدِ عقلية الـ 1٪' if lang == 'ar' else 'WEAR THE 1% MINDSET' }}</h1>
+      <p>{{ 'مجموعة K1 الجديدة أصبحت متاحة للطلب المسبق حصريًا عبر القرقني شوب. اختر قطعتك ولونك ومقاسك قبل نفاد الكمية المخصصة.' if lang == 'ar' else 'The new K1 collection is now available to pre-order exclusively through Elgargni Shop. Secure your style, color and size before the allocation sells out.' }}</p>
+      <span class="k1-offer"><i></i>{{ 'خصم 10٪ خاص بالطلب المسبق' if lang == 'ar' else 'Exclusive 10% pre-order discount' }}</span>
+    </div>
+  </section>
+  <section class="k1-catalog">
+    <div class="container">
+      <div class="k1-trust reveal">
+        <div><strong>{{ 'طلب مضمون' if lang == 'ar' else 'Reserved order' }}</strong><span>{{ 'نحجز اللون والمقاس الذي اخترته' if lang == 'ar' else 'Your selected color and size are reserved' }}</span></div>
+        <div><strong>{{ 'خصم حصري' if lang == 'ar' else 'Exclusive saving' }}</strong><span>{{ 'السعر المخفّض مخصص للبري أوردر فقط' if lang == 'ar' else 'Discounted pricing applies to pre-orders only' }}</span></div>
+        <div><strong>{{ 'تأكيد مباشر' if lang == 'ar' else 'Direct confirmation' }}</strong><span>{{ 'سنتواصل معك لتأكيد تفاصيل طلبك' if lang == 'ar' else 'We will contact you to confirm your order' }}</span></div>
+      </div>
+      <div class="k1-products-grid">
+        {% for product in products %}
+        <article class="k1-product reveal">
+          <div class="k1-product-media">
+            <img id="k1-main-{{ product.id }}" src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name_ar if lang == 'ar' else product.name }}" loading="lazy">
+            <span class="k1-discount">-10%</span>
+            <div class="k1-thumbs" aria-label="{{ 'صور المنتج' if lang == 'ar' else 'Product images' }}">
+              {% for image in product.gallery %}<button class="k1-thumb {{ 'is-active' if loop.first }}" type="button" data-k1-image="{{ url_for('static', filename='images/' ~ image) }}" data-k1-target="k1-main-{{ product.id }}"><img src="{{ url_for('static', filename='images/' ~ image) }}" alt="" loading="lazy"></button>{% endfor %}
+            </div>
+          </div>
+          <div class="k1-product-body">
+            <div class="k1-product-head">
+              <h2>{{ product.name_ar if lang == 'ar' else product.name }}</h2>
+              <div class="k1-prices"><span class="k1-original">{{ 'قبل' if lang == 'ar' else 'Was' }} {{ '%.2f'|format(product.original_price) }} LYD</span><span class="k1-sale">{{ '%.2f'|format(product.price) }} LYD</span></div>
+            </div>
+            <form class="add-to-cart-form k1-preorder-form" action="{{ url_for('cart_add', product_id=product.id) }}" method="post">
+              <label class="k1-field"><span>{{ 'اللون' if lang == 'ar' else 'Color' }}</span><select name="color" required>{% for color in product.colors %}<option value="{{ color }}">{{ product.colors_ar[loop.index0] if lang == 'ar' else color }}</option>{% endfor %}</select></label>
+              <label class="k1-field"><span>{{ 'المقاس' if lang == 'ar' else 'Size' }}</span><select name="size" required>{% for size in product.sizes %}<option value="{{ size }}">{{ size }}</option>{% endfor %}</select></label>
+              <label class="k1-field"><span>{{ 'الكمية' if lang == 'ar' else 'Qty' }}</span><input type="number" name="quantity" value="1" min="1" max="10" required></label>
+              <button class="btn" type="submit">{{ 'أضف الطلب المسبق للسلة' if lang == 'ar' else 'Add pre-order to cart' }}</button>
+            </form>
+            <p class="k1-product-note">{{ 'سيتم التواصل معك لتأكيد موعد الوصول والدفع.' if lang == 'ar' else 'We will contact you to confirm arrival and payment details.' }}</p>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</main>
+<script>document.addEventListener('click',function(e){const b=e.target.closest('[data-k1-image]');if(!b)return;const img=document.getElementById(b.dataset.k1Target);if(img){img.style.opacity='.25';setTimeout(()=>{img.src=b.dataset.k1Image;img.style.opacity='1'},140)}b.parentElement.querySelectorAll('.k1-thumb').forEach(x=>x.classList.remove('is-active'));b.classList.add('is-active')});</script>
+{% endblock %}

@@ -206,7 +206,8 @@
             <span>{{ 'جودة استثنائية' if lang == 'ar' else 'Premium quality' }}</span>
           </div>
           <div class="k1-reveal-line"><span></span><p>{{ 'استعد لتكون ضمن الـ 1٪' if lang == 'ar' else 'Prepare to be the 1%' }}</p></div>
-          <a class="k1-notify" href="https://wa.me/218940000849?text={{ ('أريد معرفة موعد إطلاق K1 Performance' if lang == 'ar' else 'Notify me when K1 Performance launches')|urlencode }}" target="_blank" rel="noopener">
+          <a class="k1-notify" href="{{ url_for('k1_preorder') }}">
+            <span>{{ 'اطلب الآن بخصم 10٪' if lang == 'ar' else 'Pre-order now — 10% off' }}</span>
             {{ 'أخبرني عند الإطلاق' if lang == 'ar' else 'Notify me at launch' }}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
