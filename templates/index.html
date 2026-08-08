@@ -90,20 +90,20 @@
     <div class="container">
       <a class="k1-home-card reveal" href="{{ url_for('k1_preorder') }}" aria-label="{{ 'تسوق مجموعة K1 للطلب المسبق' if lang == 'ar' else 'Shop the K1 pre-order collection' }}">
         <div class="k1-home-image">
-          <img src="{{ url_for('static', filename='images/k1-coming-soon.png') }}" alt="K1 Performance clothing and supplements" loading="lazy" width="1536" height="1002">
-          <span class="k1-home-brand">K1 <small>PERFORMANCE</small></span>
+          <img src="{{ url_for('static', filename='images/k1/k1-clothing-collection-hero.jpeg') }}" alt="K1 Performance clothing collection" loading="lazy" width="1280" height="426">
+          <span class="k1-home-brand">K1 <small>CLOTHING · PERFORMANCE</small></span>
         </div>
         <div class="k1-home-copy">
-          <span class="k1-home-label"><i></i>{{ 'الطلب المسبق مفتوح الآن' if lang == 'ar' else 'PRE-ORDER NOW OPEN' }}</span>
-          <p class="k1-home-overline">EXCLUSIVE BRAND DROP</p>
-          <h2>{{ 'مجموعة K1 الجديدة' if lang == 'ar' else 'THE NEW K1 COLLECTION' }}</h2>
-          <p>{{ 'ملابس أداء بهوية مختلفة. احجز لونك ومقاسك الآن واستفد من خصم 10٪ الخاص بالطلب المسبق.' if lang == 'ar' else 'Performance clothing with a different identity. Reserve your color and size now with an exclusive 10% pre-order saving.' }}</p>
+          <span class="k1-home-label"><i></i>{{ 'الطلب المسبق متاح الآن' if lang == 'ar' else 'PRE-ORDER AVAILABLE NOW' }}</span>
+          <p class="k1-home-overline">K1 CLOTHING · LIMITED DROP</p>
+          <h2>{{ 'مجموعة K1 للملابس' if lang == 'ar' else 'K1 CLOTHING COLLECTION' }}</h2>
+          <p>{{ 'ارتقِ بإطلالتك وتدرّب بهوية مختلفة. احجز قطعتك ولونك ومقاسك الآن واستفد من خصم الطلب المسبق الحصري.' if lang == 'ar' else 'Elevate your look and train with a different identity. Reserve your piece, color and size with an exclusive pre-order saving.' }}</p>
           <div class="k1-home-meta">
-            <span>{{ 'خصم 10٪' if lang == 'ar' else '10% OFF' }}</span>
+            <span>{{ 'خصم بري أوردر 10٪' if lang == 'ar' else '10% PRE-ORDER OFF' }}</span>
             <span>{{ 'مقاسات محدودة' if lang == 'ar' else 'LIMITED SIZES' }}</span>
             <span>{{ 'ألوان متعددة' if lang == 'ar' else 'MULTIPLE COLORS' }}</span>
           </div>
-          <span class="k1-home-cta">{{ 'اكتشف المجموعة واطلب الآن' if lang == 'ar' else 'Explore the collection' }} <b>→</b></span>
+          <span class="k1-home-cta">{{ 'استعرض الملابس واطلب مسبقًا' if lang == 'ar' else 'Explore clothing & pre-order' }} <b>→</b></span>
         </div>
       </a>
     </div>
