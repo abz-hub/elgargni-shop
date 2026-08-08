@@ -21,16 +21,17 @@
       <div class="k1-products-grid">
         {% for product in products %}
         <article class="k1-product reveal">
-          <div class="k1-product-media">
+          <a class="k1-product-media" href="{{ url_for('k1_product_detail', product_id=product.id) }}" aria-label="{{ product.name_ar if lang == 'ar' else product.name }}">
             <img id="k1-main-{{ product.id }}" src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name_ar if lang == 'ar' else product.name }}" loading="lazy">
             <span class="k1-discount">-10%</span>
+            <span class="k1-open-product">{{ 'عرض التفاصيل' if lang == 'ar' else 'View details' }} →</span>
             <div class="k1-thumbs" aria-label="{{ 'صور المنتج' if lang == 'ar' else 'Product images' }}">
-              {% for image in product.gallery %}<button class="k1-thumb {{ 'is-active' if loop.first }}" type="button" data-k1-image="{{ url_for('static', filename='images/' ~ image) }}" data-k1-target="k1-main-{{ product.id }}"><img src="{{ url_for('static', filename='images/' ~ image) }}" alt="" loading="lazy"></button>{% endfor %}
+              {% for image in product.gallery %}<span class="k1-thumb {{ 'is-active' if loop.first }}"><img src="{{ url_for('static', filename='images/' ~ image) }}" alt="" loading="lazy"></span>{% endfor %}
             </div>
-          </div>
+          </a>
           <div class="k1-product-body">
             <div class="k1-product-head">
-              <h2>{{ product.name_ar if lang == 'ar' else product.name }}</h2>
+              <h2><a href="{{ url_for('k1_product_detail', product_id=product.id) }}">{{ product.name_ar if lang == 'ar' else product.name }}</a></h2>
               <div class="k1-prices"><span class="k1-original">{{ 'قبل' if lang == 'ar' else 'Was' }} {{ '%.2f'|format(product.original_price) }} LYD</span><span class="k1-sale">{{ '%.2f'|format(product.price) }} LYD</span></div>
             </div>
             <form class="add-to-cart-form k1-preorder-form" action="{{ url_for('cart_add', product_id=product.id) }}" method="post">

@@ -130,8 +130,9 @@ K1_PRODUCTS = [
     {"id": 102, "name": "K1 Wide Leg Jogger", "name_ar": "بنطال K1 واسع", "price": 274.05, "original_price": 304.50, "image": "k1/jacket-cream.jpeg", "gallery": ["k1/jacket-cream.jpeg", "k1/jacket-charcoal.jpeg", "k1/jacket-black.jpeg", "k1/jacket-maroon.jpeg"], "colors": ["Maroon", "Charcoal", "Black", "Cream / Off-white"], "colors_ar": ["خمري", "فحمي", "أسود", "كريمي"], "sizes": ["M", "L", "XL", "2XL"]},
     {"id": 103, "name": "K1 Jacket", "name_ar": "جاكيت K1", "price": 313.20, "original_price": 348.00, "image": "k1/jacket-maroon.jpeg", "gallery": ["k1/jacket-maroon.jpeg", "k1/jacket-black.jpeg", "k1/jacket-charcoal.jpeg", "k1/jacket-cream.jpeg"], "colors": ["Maroon", "Charcoal", "Black", "Cream / Off-white"], "colors_ar": ["خمري", "فحمي", "أسود", "كريمي"], "sizes": ["M", "L", "XL", "2XL"]},
     {"id": 104, "name": "K1 Workout Shorts", "name_ar": "شورت K1 رياضي", "price": 234.90, "original_price": 261.00, "image": "k1/shorts-black.jpeg", "gallery": ["k1/shorts-black.jpeg", "k1/shorts-maroon.jpeg", "k1/shorts-cream.jpeg"], "colors": ["Charcoal", "Black", "Cream / Off-white", "Dark Olive"], "colors_ar": ["فحمي", "أسود", "كريمي", "زيتوني داكن"], "sizes": ["M", "L", "XL", "2XL"]},
-    {"id": 105, "name": "K1 Kamal Oversized Shirt", "name_ar": "قميص K1 كمال أوفرسايز", "price": 234.90, "original_price": 261.00, "image": "k1/oversized-olive.jpeg", "gallery": ["k1/oversized-olive.jpeg", "k1/oversized-results.jpeg", "k1/oversized-maroon.jpeg"], "colors": ["Maroon", "Charcoal", "Black", "Cream / Off-white", "Dark Olive"], "colors_ar": ["خمري", "فحمي", "أسود", "كريمي", "زيتوني داكن"], "sizes": ["M", "L", "XL", "2XL"]},
-    {"id": 106, "name": "K1 Normal Oversized Shirt", "name_ar": "قميص K1 أوفرسايز", "price": 195.75, "original_price": 217.50, "image": "k1/oversized-results.jpeg", "gallery": ["k1/oversized-results.jpeg", "k1/oversized-maroon.jpeg", "k1/oversized-olive.jpeg"], "colors": ["Maroon", "Charcoal", "Black", "Cream / Off-white", "Dark Olive"], "colors_ar": ["خمري", "فحمي", "أسود", "كريمي", "زيتوني داكن"], "sizes": ["M", "L", "XL", "2XL"]},
+    {"id": 105, "name": "Kamal Oversized Shirt", "name_ar": "قميص كمال أوفرسايز", "price": 234.90, "original_price": 261.00, "image": "k1/oversized-olive.jpeg", "gallery": ["k1/oversized-olive.jpeg"], "colors": ["Dark Olive"], "colors_ar": ["زيتوني داكن"], "sizes": ["M", "L", "XL", "2XL"], "description_ar": "قميص أوفرسايز بتصميم كمال الأجسام المميز، بقصة واسعة مريحة وهوية K1 الرياضية.", "description_en": "A statement oversized shirt featuring the signature bodybuilding artwork, a relaxed fit and K1 performance identity."},
+    {"id": 106, "name": "Just Results Oversized Shirt", "name_ar": "قميص Just Results أوفرسايز", "price": 195.75, "original_price": 217.50, "image": "k1/oversized-results.jpeg", "gallery": ["k1/oversized-results.jpeg"], "colors": ["Black"], "colors_ar": ["أسود"], "sizes": ["M", "L", "XL", "2XL"], "description_ar": "قميص أوفرسايز أسود بطباعة Just Results الخلفية، مصمم للتمرين والإطلالة اليومية.", "description_en": "A black oversized shirt with the bold Just Results back print, made for training and everyday wear."},
+    {"id": 107, "name": "K1 Oversized Shirts", "name_ar": "قمصان K1 أوفرسايز", "price": 195.75, "original_price": 217.50, "image": "k1/oversized-k1-maroon.jpeg", "gallery": ["k1/oversized-k1-maroon.jpeg", "k1/oversized-k1-cream.jpeg", "k1/oversized-k1-charcoal.jpeg"], "colors": ["Maroon", "Cream / Off-white", "Charcoal"], "colors_ar": ["خمري", "كريمي", "فحمي"], "sizes": ["M", "L", "XL", "2XL"], "description_ar": "قميص K1 أوفرسايز أساسي بقصة رياضية واسعة وألوان مختارة تناسب التمرين والاستخدام اليومي.", "description_en": "The essential K1 oversized shirt with a relaxed athletic fit and versatile colors for training or everyday wear."},
 ]
 for _product in K1_PRODUCTS:
     _product.update({"flavor": "Pre-order", "size": " / ".join(_product["sizes"]), "category": "k1-clothing", "preorder": True})
@@ -532,6 +533,15 @@ def products():
 @app.route("/k1-preorder")
 def k1_preorder():
     return render_template("k1_preorder.html", products=K1_PRODUCTS, currency="LYD")
+
+
+@app.route("/k1-preorder/<int:product_id>")
+def k1_product_detail(product_id):
+    product = next((item for item in K1_PRODUCTS if item["id"] == product_id), None)
+    if not product:
+        abort(404)
+    related = [item for item in K1_PRODUCTS if item["id"] != product_id][:3]
+    return render_template("k1_product_detail.html", product=product, related=related, currency="LYD")
 
 
 @app.route("/cart/add/<int:product_id>", methods=["POST"])

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name_ar if lang == 'ar' else product.name }} | K1 Pre-order{% endblock %}
+{% block meta_description %}{{ product.get('description_ar', 'اطلب ملابس K1 مسبقًا بخصم 10٪.') if lang == 'ar' else product.get('description_en', 'Pre-order K1 clothing with an exclusive 10% saving.') }}{% endblock %}
+{% block content %}
+<main class="k1-detail">
+  <div class="container">
+    <a class="k1-detail-back" href="{{ url_for('k1_preorder') }}">{{ '→ العودة إلى مجموعة K1' if lang == 'ar' else '← Back to K1 collection' }}</a>
+    <div class="k1-detail-layout">
+      <div class="k1-detail-gallery reveal">
+        <div class="k1-detail-main">
+          <img id="k1-detail-main" src="{{ url_for('static', filename='images/' ~ product.image) }}" alt="{{ product.name_ar if lang == 'ar' else product.name }}">
+          <span class="k1-discount">-10%</span>
+        </div>
+        {% if product.gallery|length > 1 %}<div class="k1-detail-thumbs">{% for image in product.gallery %}<button type="button" class="k1-detail-thumb {{ 'is-active' if loop.first }}" data-detail-image="{{ url_for('static', filename='images/' ~ image) }}"><img src="{{ url_for('static', filename='images/' ~ image) }}" alt=""></button>{% endfor %}</div>{% endif %}
+      </div>
+      <section class="k1-detail-info reveal">
+        <span class="k1-detail-badge">K1 PERFORMANCE · PRE-ORDER</span>
+        <h1>{{ product.name_ar if lang == 'ar' else product.name }}</h1>
+        <p class="k1-detail-description">{{ product.get('description_ar', 'قطعة رياضية من مجموعة K1 الجديدة، مصممة بقصة مريحة وجودة مناسبة للتمرين والاستخدام اليومي.') if lang == 'ar' else product.get('description_en', 'A performance piece from the new K1 collection, designed for comfort in training and everyday wear.') }}</p>
+        <div class="k1-detail-price"><strong>{{ '%.2f'|format(product.price) }} LYD</strong><del>{{ '%.2f'|format(product.original_price) }} LYD</del><span class="k1-detail-save">{{ 'وفر 10٪' if lang == 'ar' else 'SAVE 10%' }}</span></div>
+        <form class="add-to-cart-form k1-detail-form" action="{{ url_for('cart_add', product_id=product.id) }}" method="post">
+          <label class="k1-field"><span>{{ 'اللون' if lang == 'ar' else 'Color' }}</span><select name="color" required>{% for color in product.colors %}<option value="{{ color }}">{{ product.colors_ar[loop.index0] if lang == 'ar' else color }}</option>{% endfor %}</select></label>
+          <label class="k1-field"><span>{{ 'المقاس' if lang == 'ar' else 'Size' }}</span><select name="size" required>{% for size in product.sizes %}<option value="{{ size }}">{{ size }}</option>{% endfor %}</select></label>
+          <label class="k1-field"><span>{{ 'الكمية' if lang == 'ar' else 'Qty' }}</span><input type="number" name="quantity" value="1" min="1" max="10" required></label>
+          <button class="btn" type="submit">{{ 'أضف الطلب المسبق للسلة' if lang == 'ar' else 'Add pre-order to cart' }}</button>
+        </form>
+        <ul class="k1-detail-points"><li>{{ 'خصم 10٪ مخصص للطلب المسبق' if lang == 'ar' else 'Exclusive 10% pre-order discount' }}</li><li>{{ 'نحجز اللون والمقاس الذي اخترته' if lang == 'ar' else 'Your chosen color and size are reserved' }}</li><li>{{ 'سنتواصل معك لتأكيد الوصول والدفع' if lang == 'ar' else 'We contact you to confirm arrival and payment' }}</li></ul>
+      </section>
+    </div>
+    <section class="k1-related"><h2>{{ 'قطع أخرى من K1' if lang == 'ar' else 'More from K1' }}</h2><div class="k1-related-grid">{% for item in related %}<a class="k1-related-card" href="{{ url_for('k1_product_detail', product_id=item.id) }}"><img src="{{ url_for('static', filename='images/' ~ item.image) }}" alt=""><span>{{ item.name_ar if lang == 'ar' else item.name }}</span></a>{% endfor %}</div></section>
+  </div>
+</main>
+<script>document.addEventListener('click',function(e){const b=e.target.closest('[data-detail-image]');if(!b)return;const m=document.getElementById('k1-detail-main');m.style.opacity='.2';setTimeout(()=>{m.src=b.dataset.detailImage;m.style.opacity='1'},130);document.querySelectorAll('.k1-detail-thumb').forEach(x=>x.classList.remove('is-active'));b.classList.add('is-active')});</script>
+{% endblock %}
