@@ -53,35 +53,6 @@
     </div>
   </section>
 
-  <section id="rewards" class="section home-rewards-section">
-    <div class="container">
-      <a class="home-rewards-card reveal" href="{{ url_for('account') }}">
-        <div class="home-rewards-copy">
-          <span class="home-rewards-kicker"><i></i> ELGARGNI REWARDS</span>
-          {% if current_customer %}
-          <h2>{{ '&#1581;&#1587;&#1575;&#1576;&#1603;. &#1606;&#1602;&#1575;&#1591;&#1603;. &#1605;&#1603;&#1575;&#1601;&#1570;&#1578;&#1603;.'|safe if lang == 'ar' else 'YOUR ACCOUNT. YOUR REWARDS.' }}</h2>
-          <p>{{ '&#1578;&#1575;&#1576;&#1593; &#1591;&#1604;&#1576;&#1575;&#1578;&#1603; &#1608;&#1575;&#1580;&#1605;&#1593; &#1575;&#1604;&#1606;&#1602;&#1575;&#1591; &#1605;&#1593; &#1603;&#1604; &#1593;&#1605;&#1604;&#1610;&#1577; &#1588;&#1585;&#1575;&#1569;.'|safe if lang == 'ar' else 'Track your orders and earn points every time you shop.' }}</p>
-          {% else %}
-          <h2>{{ '&#1578;&#1587;&#1608;&#1617;&#1602;. &#1575;&#1580;&#1605;&#1593;. &#1575;&#1587;&#1578;&#1601;&#1583;.'|safe if lang == 'ar' else 'SHOP. EARN. REWARD.' }}</h2>
-          <p>{{ '&#1575;&#1606;&#1590;&#1605; &#1573;&#1604;&#1609; &#1605;&#1603;&#1575;&#1601;&#1570;&#1578; &#1575;&#1604;&#1602;&#1585;&#1602;&#1606;&#1610;&#1548; &#1578;&#1575;&#1576;&#1593; &#1591;&#1604;&#1576;&#1575;&#1578;&#1603; &#1608;&#1575;&#1581;&#1589;&#1604; &#1593;&#1604;&#1609; &#1582;&#1589;&#1608;&#1605; &#1581;&#1589;&#1585;&#1610;&#1577;.'|safe if lang == 'ar' else 'Join Elgargni Rewards, track your orders and unlock exclusive discounts.' }}</p>
-          {% endif %}
-          <div class="home-rewards-benefits">
-            <span><strong>1</strong>{{ '&#1606;&#1602;&#1591;&#1577; &#1604;&#1603;&#1604; 10 &#1583;.&#1604;'|safe if lang == 'ar' else 'point per 10 LYD' }}</span>
-            <span><strong>100</strong>{{ '&#1606;&#1602;&#1591;&#1577; &#1604;&#1601;&#1578;&#1581; &#1575;&#1604;&#1605;&#1603;&#1575;&#1601;&#1571;&#1577;'|safe if lang == 'ar' else 'points unlock reward' }}</span>
-            <span><strong>10 LYD</strong>{{ '&#1582;&#1589;&#1605; &#1593;&#1606;&#1583; &#1575;&#1604;&#1575;&#1587;&#1578;&#1576;&#1583;&#1575;&#1604;'|safe if lang == 'ar' else 'redemption discount' }}</span>
-          </div>
-          <span class="home-rewards-cta">{{ '&#1575;&#1601;&#1578;&#1581; &#1581;&#1587;&#1575;&#1576;&#1610;'|safe if lang == 'ar' and current_customer else ('&#1575;&#1606;&#1590;&#1605; &#1604;&#1604;&#1605;&#1603;&#1575;&#1601;&#1570;&#1578; &#1575;&#1604;&#1570;&#1606;'|safe if lang == 'ar' else ('Open my account' if current_customer else 'Join rewards now')) }} <b>&#8599;</b></span>
-        </div>
-        <div class="home-rewards-pass" aria-hidden="true">
-          <div class="rewards-pass-top"><img src="{{ url_for('static', filename='images/logo.webp') }}" alt="" width="54" height="54"><span>MEMBER</span></div>
-          <div class="rewards-pass-points"><small>{{ '&#1585;&#1589;&#1610;&#1583; &#1575;&#1604;&#1606;&#1602;&#1575;&#1591;'|safe if lang == 'ar' else 'POINTS BALANCE' }}</small><strong>{{ current_customer.points if current_customer else '000' }}</strong></div>
-          <div class="rewards-pass-line"><i></i></div>
-          <div class="rewards-pass-bottom"><span>ELGARGNI SHOP</span><span>REWARDS CLUB</span></div>
-        </div>
-      </a>
-    </div>
-  </section>
-
   <section id="about" class="section">
     <div class="container">
       <p class="eyebrow reveal">{{ t('about.eyebrow') }}</p>

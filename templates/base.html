@@ -73,6 +73,17 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 4 6 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6-4-9s1.5-6.3 4-9z"/></svg>
           <span>{{ 'العربية' if lang == 'en' else 'English' }}</span>
         </a>
+        <a href="{{ url_for('account') }}" class="account-nav-button {{ 'is-member' if current_customer }}" aria-label="{{ '&#1581;&#1587;&#1575;&#1576;&#1610; &#1608;&#1575;&#1604;&#1605;&#1603;&#1575;&#1601;&#1570;&#1578;'|safe if lang == 'ar' else 'Account and rewards' }}">
+          <span class="account-nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6"/></svg>
+            {% if current_customer %}<i></i>{% endif %}
+          </span>
+          <span class="account-nav-copy">
+            <small>{{ '&#1605;&#1585;&#1581;&#1576;&#1575;&#1611;'|safe if lang == 'ar' and current_customer else ('&#1581;&#1587;&#1575;&#1576;&#1610;'|safe if lang == 'ar' else ('Welcome' if current_customer else 'Account')) }}</small>
+            <strong>{{ current_customer.name if current_customer else ('&#1578;&#1587;&#1580;&#1610;&#1604; &#1575;&#1604;&#1583;&#1582;&#1608;&#1604;'|safe if lang == 'ar' else 'Sign in') }}</strong>
+          </span>
+          {% if current_customer %}<span class="account-nav-points">{{ current_customer.points }} <small>{{ '&#1606;&#1602;&#1591;&#1577;'|safe if lang == 'ar' else 'PTS' }}</small></span>{% endif %}
+        </a>
         <a
           href="{{ url_for('cart') }}"
           class="cart-button"
