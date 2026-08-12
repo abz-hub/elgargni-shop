@@ -24,6 +24,7 @@
         <p>{{ t('order_confirmation.other_instructions', phone=order.customer.phone) }}</p>
         {% endif %}
         <p>{{ t('order_confirmation.followup', phone=order.customer.phone) }}</p>
+        {% if order.points_earned %}<p class="points-earned">+{{ order.points_earned }} {{ 'نقطة أضيفت إلى حسابك' if lang == 'ar' else 'points added to your account' }}</p>{% endif %}
         <a class="btn" href="{{ url_for('products') }}">{{ t('order_confirmation.continue_shopping') }}</a>
       </div>
 

@@ -55,6 +55,17 @@
           {% endfor %}
         </div>
 
+        {% if customer %}
+        <div class="checkout-reward {{ 'is-ready' if reward_available }}">
+          <div><strong>{{ 'مكافآت القرقني' if lang == 'ar' else 'Elgargni Rewards' }}</strong><span>{{ customer.points }} {{ 'نقطة متاحة' if lang == 'ar' else 'points available' }}</span></div>
+          {% if reward_available %}
+          <label><input type="checkbox" name="use_reward" value="yes" {% if form.get('use_reward') == 'yes' %}checked{% endif %}><span>{{ 'استخدم 100 نقطة للحصول على خصم 10 د.ل' if lang == 'ar' else 'Use 100 points for a 10 LYD discount' }}</span></label>
+          {% else %}
+          <small>{{ 'تحتاج 100 نقطة لفتح مكافأة 10 د.ل' if lang == 'ar' else 'Reach 100 points to unlock a 10 LYD reward' }}</small>
+          {% endif %}
+        </div>
+        {% endif %}
+
         <button type="submit" class="btn">{{ t('checkout.place_order') }}</button>
       </form>
 

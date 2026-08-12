@@ -18,6 +18,19 @@
         <h1>{{ product.name_ar if lang == 'ar' else product.name }}</h1>
         <p class="k1-detail-description">{{ product.get('description_ar', 'قطعة رياضية من مجموعة K1 الجديدة، مصممة بقصة مريحة وجودة مناسبة للتمرين والاستخدام اليومي.') if lang == 'ar' else product.get('description_en', 'A performance piece from the new K1 collection, designed for comfort in training and everyday wear.') }}</p>
         <div class="k1-detail-price"><strong>{{ '%.2f'|format(product.price) }} LYD</strong><del>{{ '%.2f'|format(product.original_price) }} LYD</del><span class="k1-detail-save">{{ 'وفر 10٪' if lang == 'ar' else 'SAVE 10%' }}</span></div>
+        <details class="k1-size-guide" data-product-id="{{ product.id }}" data-sizes="{{ product.sizes|join(',') }}">
+          <summary><span><b>{{ 'دليل المقاس الذكي' if lang == 'ar' else 'Smart size guide' }}</b><small>{{ 'اعرف مقاسك باستخدام الطول والوزن' if lang == 'ar' else 'Find your fit using height and weight' }}</small></span><i>+</i></summary>
+          <div class="k1-size-guide-body">
+            <div class="k1-size-fields">
+              <label class="k1-field"><span>{{ 'الطول (سم)' if lang == 'ar' else 'Height (cm)' }}</span><input type="number" data-size-height min="145" max="210" placeholder="175"></label>
+              <label class="k1-field"><span>{{ 'الوزن (كجم)' if lang == 'ar' else 'Weight (kg)' }}</span><input type="number" data-size-weight min="40" max="180" placeholder="75"></label>
+              <label class="k1-field"><span>{{ 'القصة المفضلة' if lang == 'ar' else 'Preferred fit' }}</span><select data-size-fit><option value="regular">{{ 'مناسبة' if lang == 'ar' else 'Regular' }}</option><option value="relaxed">{{ 'أوسع ومريحة' if lang == 'ar' else 'Relaxed' }}</option></select></label>
+            </div>
+            <button type="button" class="btn btn-small" data-size-calculate>{{ 'اقترح مقاسي' if lang == 'ar' else 'Recommend my size' }}</button>
+            <div class="k1-size-result" data-size-result hidden></div>
+            <p class="k1-size-note">{{ 'النتيجة تقديرية. إذا كنت بين مقاسين اختر الأكبر لراحة أكثر.' if lang == 'ar' else 'This is an estimate. If between sizes, choose the larger size for more comfort.' }}</p>
+          </div>
+        </details>
         <form class="add-to-cart-form k1-detail-form" action="{{ url_for('cart_add', product_id=product.id) }}" method="post">
           <label class="k1-field"><span>{{ 'اللون' if lang == 'ar' else 'Color' }}</span><select name="color" required>{% for color in product.colors %}<option value="{{ color }}">{{ product.colors_ar[loop.index0] if lang == 'ar' else color }}</option>{% endfor %}</select></label>
           <label class="k1-field"><span>{{ 'المقاس' if lang == 'ar' else 'Size' }}</span><select name="size" required>{% for size in product.sizes %}<option value="{{ size }}">{{ size }}</option>{% endfor %}</select></label>

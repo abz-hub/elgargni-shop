@@ -602,3 +602,27 @@ document.addEventListener("DOMContentLoaded", () => {
   initQuickView();
   initAiChat();
 });
+document.addEventListener('click', function (event) {
+  const calculate = event.target.closest('[data-size-calculate]');
+  if (!calculate) return;
+  const guide = calculate.closest('.k1-size-guide');
+  const height = Number(guide.querySelector('[data-size-height]').value);
+  const weight = Number(guide.querySelector('[data-size-weight]').value);
+  const fit = guide.querySelector('[data-size-fit]').value;
+  const result = guide.querySelector('[data-size-result]');
+  const sizes = guide.dataset.sizes.split(',');
+  if (!height || !weight) {
+    result.hidden = false;
+    result.textContent = document.documentElement.lang === 'ar' ? '\u0623\u062f\u062e\u0644 \u0627\u0644\u0637\u0648\u0644 \u0648\u0627\u0644\u0648\u0632\u0646 \u0623\u0648\u0644\u0627\u064b.' : 'Enter your height and weight first.';
+    return;
+  }
+  const score = weight + (height - 170) * 0.55 + (fit === 'relaxed' ? 8 : 0);
+  let size;
+  if (guide.dataset.productId === '101') size = score < 64 ? 'S' : score < 76 ? 'M' : score < 90 ? 'L' : 'XL';
+  else size = score < 78 ? 'M' : score < 92 ? 'L' : score < 107 ? 'XL' : '2XL';
+  if (!sizes.includes(size)) size = sizes[sizes.length - 1];
+  result.hidden = false;
+  result.innerHTML = (document.documentElement.lang === 'ar' ? '\u0627\u0644\u0645\u0642\u0627\u0633 \u0627\u0644\u0645\u0642\u062a\u0631\u062d \u0644\u0643: <strong>SIZE</strong>' : 'Your recommended size: <strong>SIZE</strong>').replace('SIZE', size);
+  const select = document.querySelector('.k1-detail-form select[name=size]');
+  if (select) select.value = size;
+});

@@ -1,5 +1,6 @@
 import json
 import os
+import sqlite3
 import urllib.parse
 import urllib.request
 import uuid
@@ -17,6 +18,7 @@ from flask import (
     url_for,
 )
 
+from werkzeug.security import check_password_hash, generate_password_hash
 from translations import t as translate
 
 app = Flask(__name__)
@@ -25,6 +27,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-producti
 PRODUCT_IMAGE_DIR = os.path.join(app.static_folder, "images", "products")
 ORDERS_LOG_PATH = os.path.join(os.path.dirname(__file__), "orders.jsonl")
 SUBSCRIPTIONS_LOG_PATH = os.path.join(os.path.dirname(__file__), "subscriptions.jsonl")
+CUSTOMER_DB_PATH = os.environ.get("CUSTOMER_DB_PATH", os.path.join(os.path.dirname(__file__), "customer_accounts.db"))
 PUBLIC_SITE_URL = os.environ.get("PUBLIC_SITE_URL", "https://elgargnishop.store").rstrip("/")
 OPENAI_API_URL = "https://api.openai.com/v1/responses"
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5-mini")
@@ -180,6 +183,58 @@ PAYMENT_METHODS = [
 PAYMENT_METHODS_BY_ID = {m["id"]: m for m in PAYMENT_METHODS}
 
 
+def normalize_phone(phone):
+    digits = "".join(char for char in (phone or "") if char.isdigit())
+    return digits[-10:] if len(digits) > 10 else digits
+
+
+def customer_db():
+    connection = sqlite3.connect(CUSTOMER_DB_PATH)
+    connection.row_factory = sqlite3.Row
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS customers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            phone TEXT NOT NULL UNIQUE,
+            pin_hash TEXT NOT NULL,
+            points INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL
+        )
+    """)
+    connection.commit()
+    return connection
+
+
+def current_customer():
+    customer_id = session.get("customer_id")
+    if not customer_id:
+        return None
+    with customer_db() as connection:
+        row = connection.execute("SELECT id, name, phone, points, created_at FROM customers WHERE id = ?", (customer_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def customer_orders(phone):
+    if not os.path.exists(ORDERS_LOG_PATH):
+        return []
+    orders = []
+    with open(ORDERS_LOG_PATH, encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                order = json.loads(line)
+            except (ValueError, TypeError):
+                continue
+            if normalize_phone(order.get("customer", {}).get("phone")) == phone:
+                orders.append(order)
+    return list(reversed(orders[-20:]))
+
+
+def update_customer_points(customer_id, change):
+    with customer_db() as connection:
+        connection.execute("UPDATE customers SET points = MAX(0, points + ?) WHERE id = ?", (change, customer_id))
+        connection.commit()
+
+
 def get_lang():
     return session.get("lang", "en")
 
@@ -191,6 +246,7 @@ def inject_i18n():
         "lang": lang,
         "text_dir": "rtl" if lang == "ar" else "ltr",
         "t": lambda key, **kwargs: translate(key, lang=lang, **kwargs),
+        "current_customer": current_customer(),
     }
 
 
@@ -544,6 +600,52 @@ def k1_product_detail(product_id):
     return render_template("k1_product_detail.html", product=product, related=related, currency="LYD")
 
 
+@app.route("/account", methods=["GET", "POST"])
+def account():
+    lang = get_lang()
+    errors = []
+    if request.method == "POST":
+        action = request.form.get("action")
+        phone = normalize_phone(request.form.get("phone"))
+        pin = (request.form.get("pin") or "").strip()
+        name = (request.form.get("name") or "").strip()
+        if len(phone) < 8:
+            errors.append("أدخل رقم هاتف صحيح." if lang == "ar" else "Enter a valid phone number.")
+        if not pin.isdigit() or not 4 <= len(pin) <= 8:
+            errors.append("رمز PIN يجب أن يتكون من 4 إلى 8 أرقام." if lang == "ar" else "PIN must contain 4 to 8 digits.")
+        if action == "register" and not name:
+            errors.append("أدخل اسمك الكامل." if lang == "ar" else "Enter your full name.")
+        if not errors:
+            with customer_db() as connection:
+                existing = connection.execute("SELECT * FROM customers WHERE phone = ?", (phone,)).fetchone()
+                if action == "register":
+                    if existing:
+                        errors.append("يوجد حساب بهذا الرقم بالفعل." if lang == "ar" else "An account already exists for this phone.")
+                    else:
+                        cursor = connection.execute(
+                            "INSERT INTO customers (name, phone, pin_hash, created_at) VALUES (?, ?, ?, ?)",
+                            (name, phone, generate_password_hash(pin), datetime.now(timezone.utc).isoformat()),
+                        )
+                        connection.commit()
+                        session["customer_id"] = cursor.lastrowid
+                        return redirect(url_for("account"))
+                elif not existing or not check_password_hash(existing["pin_hash"], pin):
+                    errors.append("رقم الهاتف أو رمز PIN غير صحيح." if lang == "ar" else "Phone number or PIN is incorrect.")
+                else:
+                    session["customer_id"] = existing["id"]
+                    return redirect(url_for("account"))
+    customer = current_customer()
+    if customer:
+        return render_template("account.html", customer=customer, orders=customer_orders(customer["phone"]), currency="LYD")
+    return render_template("account_auth.html", errors=errors, form=request.form if request.method == "POST" else {})
+
+
+@app.route("/account/logout", methods=["POST"])
+def account_logout():
+    session.pop("customer_id", None)
+    return redirect(url_for("account"))
+
+
 @app.route("/cart/add/<int:product_id>", methods=["POST"])
 def cart_add(product_id):
     if product_id not in PRODUCTS_BY_ID:
@@ -590,12 +692,22 @@ def checkout():
         return redirect(url_for("products"))
     total = get_cart_total(items)
     lang = get_lang()
+    customer = current_customer()
+    reward_available = bool(customer and customer["points"] >= 100)
 
     if request.method == "POST":
         name = (request.form.get("name") or "").strip()
         phone = (request.form.get("phone") or "").strip()
         address = (request.form.get("address") or "").strip()
         payment_method = PAYMENT_METHODS_BY_ID.get(request.form.get("payment_method"))
+        use_reward = request.form.get("use_reward") == "yes"
+        reward_discount = 0
+        points_redeemed = 0
+        if use_reward and reward_available and normalize_phone(phone) == customer["phone"]:
+            reward_discount = 10
+            points_redeemed = 100
+        final_total = max(0, total - reward_discount)
+        points_earned = int(final_total // 10) if customer and normalize_phone(phone) == customer["phone"] else 0
 
         errors = []
         if not name:
@@ -616,12 +728,17 @@ def checkout():
                 payment_methods=PAYMENT_METHODS,
                 errors=errors,
                 form=request.form,
+                customer=customer,
+                reward_available=reward_available,
             )
 
         order = {
             "order_id": uuid.uuid4().hex[:8].upper(),
             "created_at": datetime.now(timezone.utc).isoformat(),
             "customer": {"name": name, "phone": phone, "address": address},
+            "customer_id": customer["id"] if customer and normalize_phone(phone) == customer["phone"] else None,
+            "reward_discount": reward_discount,
+            "points_earned": points_earned,
             "payment_method": payment_method["id"],
             "line_items": [
                 {
@@ -633,12 +750,15 @@ def checkout():
                 }
                 for item in items
             ],
-            "total": total,
+            "subtotal": total,
+            "total": final_total,
         }
         with open(ORDERS_LOG_PATH, "a", encoding="utf-8") as f:
             f.write(json.dumps(order) + "\n")
 
         notify_owner(build_order_message(order, payment_method))
+        if order["customer_id"]:
+            update_customer_points(order["customer_id"], points_earned - points_redeemed)
 
         session["cart"] = {}
 
@@ -656,7 +776,9 @@ def checkout():
         currency="LYD",
         payment_methods=PAYMENT_METHODS,
         errors=[],
-        form={},
+        form={"name": customer["name"], "phone": customer["phone"]} if customer else {},
+        customer=customer,
+        reward_available=reward_available,
     )
 
 
