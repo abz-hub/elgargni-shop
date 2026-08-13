@@ -76,7 +76,7 @@ COACHES = [
         "role_key": "coaches.hafed.role",
         "bio_key": "coaches.hafed.bio",
         "image": "images/coaches/hafed-abugrin.jpeg",
-        "price": 250,
+        "price": 550,
     },
     {
         "id": "rida-almjrab",

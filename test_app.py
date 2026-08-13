@@ -361,7 +361,7 @@ def test_selected_coach_is_saved_with_subscription(monkeypatch, tmp_path):
     assert saved["plan"] == "coach-hafed-abugrin"
     assert saved["coach_id"] == "hafed-abugrin"
     assert saved["plan_name"] == "Hafed Abugrin"
-    assert saved["price"] == 250
+    assert saved["price"] == 550
 
 
 def test_subscribe_rejects_missing_name(monkeypatch, tmp_path):
@@ -554,7 +554,7 @@ def test_coaching_team_renders_all_four_coaches_in_english():
     assert "Mohammed Alsaid" in body
     assert "Seraj Algot" in body
     assert "Hafed Abugrin" in body
-    assert body.count("250") >= 3
+    assert body.count("250") >= 2
     assert "550" in body
     assert 'src="/static/images/coach.png"' in body
     assert 'src="/static/images/coaches/mohammed-alsaid.jpeg"' in body
