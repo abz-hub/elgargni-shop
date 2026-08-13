@@ -707,3 +707,91 @@ def test_calculators_page_in_arabic():
     assert '<html lang="ar" dir="rtl">' in body
     assert "زيادة عضل" in body
     assert "الحاسبات" in body
+
+
+def test_account_registration_requires_email_verification(tmp_path, monkeypatch):
+    database = tmp_path / "customers.db"
+    monkeypatch.setattr(app_module, "CUSTOMER_DB_PATH", str(database))
+    delivered = {}
+
+    def capture_email(recipient, code, lang="ar"):
+        delivered.update(recipient=recipient, code=code, lang=lang)
+
+    monkeypatch.setattr(app_module, "send_verification_email", capture_email)
+    client = app.test_client()
+    response = client.post(
+        "/account",
+        data={
+            "action": "register",
+            "name": "Test Customer",
+            "email": "CUSTOMER@example.com",
+            "phone": "0912345678",
+            "pin": "2468",
+        },
+    )
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/account/verify")
+    assert delivered["recipient"] == "customer@example.com"
+    assert delivered["code"].isdigit() and len(delivered["code"]) == 6
+
+    with app_module.customer_db() as connection:
+        assert connection.execute("SELECT 1 FROM customers").fetchone() is None
+        pending = connection.execute(
+            "SELECT email, attempts FROM pending_customer_verifications"
+        ).fetchone()
+        assert pending["email"] == "customer@example.com"
+        assert pending["attempts"] == 0
+
+    verification = client.post(
+        "/account/verify", data={"action": "verify", "code": delivered["code"]}
+    )
+    assert verification.status_code == 302
+    assert verification.headers["Location"].endswith("/account")
+    with app_module.customer_db() as connection:
+        customer = connection.execute(
+            "SELECT email, email_verified FROM customers WHERE phone = ?",
+            ("0912345678",),
+        ).fetchone()
+        assert customer["email"] == "customer@example.com"
+        assert customer["email_verified"] == 1
+        assert connection.execute(
+            "SELECT 1 FROM pending_customer_verifications"
+        ).fetchone() is None
+
+
+def test_account_verification_rejects_wrong_code(tmp_path, monkeypatch):
+    monkeypatch.setattr(app_module, "CUSTOMER_DB_PATH", str(tmp_path / "customers.db"))
+    monkeypatch.setattr(app_module, "send_verification_email", lambda *args: None)
+    client = app.test_client()
+    client.post(
+        "/account",
+        data={
+            "action": "register", "name": "Test", "email": "test@example.com",
+            "phone": "0923456789", "pin": "1357",
+        },
+    )
+    response = client.post(
+        "/account/verify", data={"action": "verify", "code": "000000"}
+    )
+    assert response.status_code == 200
+    assert "The verification code is incorrect." in response.data.decode()
+    with app_module.customer_db() as connection:
+        assert connection.execute(
+            "SELECT attempts FROM pending_customer_verifications"
+        ).fetchone()["attempts"] == 1
+
+
+def test_existing_customer_can_still_sign_in_after_email_migration(tmp_path, monkeypatch):
+    monkeypatch.setattr(app_module, "CUSTOMER_DB_PATH", str(tmp_path / "customers.db"))
+    with app_module.customer_db() as connection:
+        connection.execute(
+            "INSERT INTO customers (name, phone, pin_hash, created_at) VALUES (?, ?, ?, ?)",
+            ("Existing", "0945678901", app_module.generate_password_hash("1234"), "2026-01-01"),
+        )
+        connection.commit()
+    response = app.test_client().post(
+        "/account",
+        data={"action": "login", "phone": "0945678901", "pin": "1234"},
+    )
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/account")

@@ -17,3 +17,10 @@ services:
         sync: false
       - key: TELEGRAM_CHAT_ID
         sync: false
+      # Free email verification through Gmail SMTP. Use a Google App Password.
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM_EMAIL
+        sync: false

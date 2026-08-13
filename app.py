@@ -1,10 +1,13 @@
 import json
 import os
+import secrets
+import smtplib
 import sqlite3
 import urllib.parse
 import urllib.request
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from email.message import EmailMessage
 
 from flask import (
     Flask,
@@ -201,8 +204,100 @@ def customer_db():
             created_at TEXT NOT NULL
         )
     """)
+    customer_columns = {
+        row["name"] for row in connection.execute("PRAGMA table_info(customers)").fetchall()
+    }
+    if "email" not in customer_columns:
+        connection.execute("ALTER TABLE customers ADD COLUMN email TEXT")
+    if "email_verified" not in customer_columns:
+        connection.execute(
+            "ALTER TABLE customers ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0"
+        )
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS pending_customer_verifications (
+            phone TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            pin_hash TEXT NOT NULL,
+            otp_hash TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            resend_after TEXT NOT NULL,
+            attempts INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL
+        )
+    """)
     connection.commit()
     return connection
+
+
+def normalize_email(email):
+    return (email or "").strip().lower()
+
+
+def send_verification_email(recipient, code, lang="ar"):
+    username = os.environ.get("SMTP_USERNAME", "").strip()
+    password = os.environ.get("SMTP_PASSWORD", "").strip()
+    if not username or not password:
+        raise RuntimeError("Email delivery is not configured")
+    host = os.environ.get("SMTP_HOST", "smtp.gmail.com").strip()
+    port = int(os.environ.get("SMTP_PORT", "465"))
+    sender = os.environ.get("SMTP_FROM_EMAIL", username).strip()
+    message = EmailMessage()
+    message["From"] = sender
+    message["To"] = recipient
+    message["Subject"] = "رمز التحقق من القرقني شوب" if lang == "ar" else "Your Elgargni Shop verification code"
+    if lang == "ar":
+        message.set_content(
+            f"رمز التحقق الخاص بك هو: {code}\n\n"
+            "الرمز صالح لمدة 10 دقائق ولا تشاركه مع أي شخص.\n"
+            "إذا لم تطلب إنشاء هذا الحساب، تجاهل الرسالة."
+        )
+    else:
+        message.set_content(
+            f"Your verification code is: {code}\n\n"
+            "This code expires in 10 minutes. Never share it with anyone.\n"
+            "If you did not create this account, ignore this email."
+        )
+    if port == 465:
+        with smtplib.SMTP_SSL(host, port, timeout=15) as smtp:
+            smtp.login(username, password)
+            smtp.send_message(message)
+    else:
+        with smtplib.SMTP(host, port, timeout=15) as smtp:
+            smtp.starttls()
+            smtp.login(username, password)
+            smtp.send_message(message)
+
+
+def create_pending_customer(name, phone, email, pin, lang):
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    now = datetime.now(timezone.utc)
+    with customer_db() as connection:
+        connection.execute(
+            "DELETE FROM pending_customer_verifications WHERE phone = ? OR email = ?",
+            (phone, email),
+        )
+        connection.execute(
+            """INSERT INTO pending_customer_verifications
+               (phone, name, email, pin_hash, otp_hash, expires_at, resend_after, attempts, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)""",
+            (
+                phone, name, email, generate_password_hash(pin),
+                generate_password_hash(code),
+                (now + timedelta(minutes=10)).isoformat(),
+                (now + timedelta(seconds=60)).isoformat(), now.isoformat(),
+            ),
+        )
+        connection.commit()
+    try:
+        send_verification_email(email, code, lang)
+    except Exception:
+        with customer_db() as connection:
+            connection.execute(
+                "DELETE FROM pending_customer_verifications WHERE phone = ?", (phone,)
+            )
+            connection.commit()
+        raise
 
 
 def current_customer():
@@ -609,26 +704,36 @@ def account():
         phone = normalize_phone(request.form.get("phone"))
         pin = (request.form.get("pin") or "").strip()
         name = (request.form.get("name") or "").strip()
+        email = normalize_email(request.form.get("email"))
         if len(phone) < 8:
             errors.append("أدخل رقم هاتف صحيح." if lang == "ar" else "Enter a valid phone number.")
         if not pin.isdigit() or not 4 <= len(pin) <= 8:
             errors.append("رمز PIN يجب أن يتكون من 4 إلى 8 أرقام." if lang == "ar" else "PIN must contain 4 to 8 digits.")
         if action == "register" and not name:
             errors.append("أدخل اسمك الكامل." if lang == "ar" else "Enter your full name.")
+        if action == "register" and ("@" not in email or "." not in email.rsplit("@", 1)[-1]):
+            errors.append("أدخل بريداً إلكترونياً صحيحاً." if lang == "ar" else "Enter a valid email address.")
         if not errors:
             with customer_db() as connection:
                 existing = connection.execute("SELECT * FROM customers WHERE phone = ?", (phone,)).fetchone()
                 if action == "register":
                     if existing:
                         errors.append("يوجد حساب بهذا الرقم بالفعل." if lang == "ar" else "An account already exists for this phone.")
+                    elif connection.execute("SELECT 1 FROM customers WHERE email = ?", (email,)).fetchone():
+                        errors.append("يوجد حساب بهذا البريد الإلكتروني بالفعل." if lang == "ar" else "An account already exists for this email.")
                     else:
-                        cursor = connection.execute(
-                            "INSERT INTO customers (name, phone, pin_hash, created_at) VALUES (?, ?, ?, ?)",
-                            (name, phone, generate_password_hash(pin), datetime.now(timezone.utc).isoformat()),
-                        )
-                        connection.commit()
-                        session["customer_id"] = cursor.lastrowid
-                        return redirect(url_for("account"))
+                        try:
+                            create_pending_customer(name, phone, email, pin, lang)
+                        except Exception as exc:
+                            app.logger.warning("Verification email failed: %s", exc)
+                            errors.append(
+                                "تعذر إرسال رمز التحقق الآن. تأكد من إعداد البريد أو حاول لاحقاً."
+                                if lang == "ar" else
+                                "We could not send the verification code. Check email setup or try again later."
+                            )
+                        else:
+                            session["pending_verification_phone"] = phone
+                            return redirect(url_for("account_verify"))
                 elif not existing or not check_password_hash(existing["pin_hash"], pin):
                     errors.append("رقم الهاتف أو رمز PIN غير صحيح." if lang == "ar" else "Phone number or PIN is incorrect.")
                 else:
@@ -639,6 +744,88 @@ def account():
         return render_template("account.html", customer=customer, orders=customer_orders(customer["phone"]), currency="LYD")
     return render_template("account_auth.html", errors=errors, form=request.form if request.method == "POST" else {})
 
+
+@app.route("/account/verify", methods=["GET", "POST"])
+def account_verify():
+    lang = get_lang()
+    phone = session.get("pending_verification_phone")
+    if not phone:
+        return redirect(url_for("account"))
+    errors = []
+    notice = None
+    with customer_db() as connection:
+        pending = connection.execute(
+            "SELECT * FROM pending_customer_verifications WHERE phone = ?", (phone,)
+        ).fetchone()
+    if not pending:
+        session.pop("pending_verification_phone", None)
+        return redirect(url_for("account"))
+    if request.method == "POST":
+        action = request.form.get("action", "verify")
+        now = datetime.now(timezone.utc)
+        if action == "resend":
+            resend_after = datetime.fromisoformat(pending["resend_after"])
+            if now < resend_after:
+                errors.append("انتظر قليلاً قبل طلب رمز جديد." if lang == "ar" else "Please wait before requesting another code.")
+            else:
+                code = f"{secrets.randbelow(1_000_000):06d}"
+                try:
+                    send_verification_email(pending["email"], code, lang)
+                except Exception as exc:
+                    app.logger.warning("Verification email resend failed: %s", exc)
+                    errors.append("تعذر إعادة إرسال الرمز الآن." if lang == "ar" else "We could not resend the code right now.")
+                else:
+                    with customer_db() as connection:
+                        connection.execute(
+                            """UPDATE pending_customer_verifications
+                               SET otp_hash = ?, expires_at = ?, resend_after = ?, attempts = 0
+                               WHERE phone = ?""",
+                            (
+                                generate_password_hash(code),
+                                (now + timedelta(minutes=10)).isoformat(),
+                                (now + timedelta(seconds=60)).isoformat(), phone,
+                            ),
+                        )
+                        connection.commit()
+                    notice = "تم إرسال رمز جديد إلى بريدك." if lang == "ar" else "A new code was sent to your email."
+        else:
+            code = (request.form.get("code") or "").strip()
+            expires_at = datetime.fromisoformat(pending["expires_at"])
+            if pending["attempts"] >= 5:
+                errors.append("تم تجاوز عدد المحاولات. اطلب رمزاً جديداً." if lang == "ar" else "Too many attempts. Request a new code.")
+            elif now > expires_at:
+                errors.append("انتهت صلاحية الرمز. اطلب رمزاً جديداً." if lang == "ar" else "The code expired. Request a new one.")
+            elif not code.isdigit() or len(code) != 6 or not check_password_hash(pending["otp_hash"], code):
+                with customer_db() as connection:
+                    connection.execute(
+                        "UPDATE pending_customer_verifications SET attempts = attempts + 1 WHERE phone = ?",
+                        (phone,),
+                    )
+                    connection.commit()
+                errors.append("رمز التحقق غير صحيح." if lang == "ar" else "The verification code is incorrect.")
+            else:
+                with customer_db() as connection:
+                    cursor = connection.execute(
+                        """INSERT INTO customers
+                           (name, phone, email, email_verified, pin_hash, created_at)
+                           VALUES (?, ?, ?, 1, ?, ?)""",
+                        (
+                            pending["name"], pending["phone"], pending["email"],
+                            pending["pin_hash"], now.isoformat(),
+                        ),
+                    )
+                    connection.execute(
+                        "DELETE FROM pending_customer_verifications WHERE phone = ?", (phone,)
+                    )
+                    connection.commit()
+                session.pop("pending_verification_phone", None)
+                session["customer_id"] = cursor.lastrowid
+                return redirect(url_for("account"))
+    local, domain = pending["email"].split("@", 1)
+    masked_email = f"{local[:2]}{'*' * max(2, len(local) - 2)}@{domain}"
+    return render_template(
+        "account_verify.html", errors=errors, notice=notice, masked_email=masked_email
+    )
 
 @app.route("/account/logout", methods=["POST"])
 def account_logout():

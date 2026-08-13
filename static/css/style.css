@@ -3261,3 +3261,12 @@ html[dir="rtl"] .ai-chat-launcher,html[dir="rtl"] .ai-chat-panel{right:24px;left
 .account-nav-button:focus-visible{outline:2px solid var(--color-accent);outline-offset:3px}html[dir=rtl] .account-nav-button{padding:0 10px 0 13px}
 @media(max-width:760px){.account-nav-button{width:46px;height:46px;padding:0;justify-content:center}.account-nav-copy,.account-nav-points{display:none}.account-nav-icon{background:transparent}.account-nav-button.is-member{border-color:rgba(199,255,0,.25)}}
 @media(max-width:390px){.nav-actions{gap:6px}.account-nav-button,.cart-button,.nav-toggle{width:43px;height:43px}.lang-switch{height:43px;padding-inline:11px}}
+
+/* Secure email verification */
+.account-security-note{margin:0;color:#8f968f;font-size:.75rem;line-height:1.7}
+.account-verify-wrap{max-width:620px}
+.account-verify-card{border-color:rgba(199,255,0,.24);box-shadow:0 28px 80px rgba(0,0,0,.28)}
+.account-verify-card .otp-input{height:64px;text-align:center;font:800 1.65rem/1 Inter;letter-spacing:.38em;direction:ltr}
+.account-verify-notice{margin:0 0 16px;padding:14px 18px;border:1px solid rgba(199,255,0,.25);border-radius:12px;background:rgba(199,255,0,.08);color:#dfff87;text-align:center}
+.account-resend-form{display:flex;justify-content:center;margin-top:14px}
+.account-resend-form .btn{min-width:210px}
