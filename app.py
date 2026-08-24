@@ -434,7 +434,7 @@ Reply in {'Arabic' if lang == 'ar' else 'English'}, matching the customer's lang
 Be concise, friendly, and helpful. Use only the catalog below; never invent stock, prices, ingredients, delivery times, or medical claims.
 For health conditions, pregnancy, medicines, allergies, or users under 18, advise speaking with a doctor or qualified dietitian before supplements.
 Do not diagnose or promise results. Creatine guidance may mention 5 g daily; otherwise advise following the product label.
-Monthly coaching plans shown on the site cost 250 LYD. If a product fits, state its exact name and price. Prices are Libyan dinars.
+If coaching is discussed, direct the customer to the coaching section for the current plan and coach prices. If a product fits, state its exact name and price. Prices are Libyan dinars.
 CATALOG:\n{catalog}"""
     input_items = []
     for item in history[-8:]:

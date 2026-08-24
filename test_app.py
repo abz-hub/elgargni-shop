@@ -795,3 +795,35 @@ def test_existing_customer_can_still_sign_in_after_email_migration(tmp_path, mon
     )
     assert response.status_code == 302
     assert response.headers["Location"].endswith("/account")
+
+def test_sitemap_uses_valid_priority_and_change_frequency_fields():
+    body = app.test_client().get("/sitemap.xml").data.decode()
+    assert "<changefreq>weekly</changefreq>" in body
+    assert "<priority>1.0</priority>" in body
+    assert "<changefreq>monthly</changefreq>" in body
+    assert "<priority>0.8</priority>" in body
+
+
+def test_ai_prompt_does_not_use_stale_fixed_coaching_price(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    captured = {}
+
+    class FakeResponse:
+        def read(self):
+            return b'{"output_text":"ok"}'
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def fake_urlopen(request, timeout):
+        captured["payload"] = json.loads(request.data.decode())
+        return FakeResponse()
+
+    monkeypatch.setattr(app_module.urllib.request, "urlopen", fake_urlopen)
+    app_module._openai_store_reply("What coaching do you offer?", [], "en")
+    instructions = captured["payload"]["instructions"]
+    assert "cost 250 LYD" not in instructions
+    assert "current plan and coach prices" in instructions
