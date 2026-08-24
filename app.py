@@ -360,6 +360,22 @@ def customer_body_scans(customer_id):
         ).fetchall()
     return [dict(row) for row in rows]
 
+
+
+def customer_subscriptions(phone):
+    if not os.path.exists(SUBSCRIPTIONS_LOG_PATH):
+        return []
+    subscriptions = []
+    with open(SUBSCRIPTIONS_LOG_PATH, encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                subscription = json.loads(line)
+            except (ValueError, TypeError):
+                continue
+            customer = subscription.get("customer") or {}
+            if normalize_phone(customer.get("phone")) == phone:
+                subscriptions.append(subscription)
+    return list(reversed(subscriptions[-20:]))
 def update_customer_points(customer_id, change):
     with customer_db() as connection:
         connection.execute("UPDATE customers SET points = MAX(0, points + ?) WHERE id = ?", (change, customer_id))
@@ -777,7 +793,7 @@ def account():
                     return redirect(url_for("account"))
     customer = current_customer()
     if customer:
-        return render_template("account.html", customer=customer, orders=customer_orders(customer["phone"]), body_scans=customer_body_scans(customer["id"]), currency="LYD")
+        return render_template("account.html", customer=customer, orders=customer_orders(customer["phone"]), subscriptions=customer_subscriptions(customer["phone"]), body_scans=customer_body_scans(customer["id"]), currency="LYD")
     return render_template("account_auth.html", errors=errors, form=request.form if request.method == "POST" else {})
 
 

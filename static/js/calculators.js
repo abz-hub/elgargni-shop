@@ -240,7 +240,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (bodySaveStatus) bodySaveStatus.textContent = isArabic ? "تعذر الحفظ الآن. حاول مرة أخرى." : "Could not save right now. Try again.";
       bodySave.disabled = false;
     }
-  });`n  form.querySelectorAll("input, select").forEach((el) => {
+  });
+  form.querySelectorAll("input, select").forEach((el) => {
     el.addEventListener("change", () => {
       if (hasResults()) calculate();
     });

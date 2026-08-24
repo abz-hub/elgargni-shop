@@ -869,3 +869,29 @@ def test_authenticated_body_scan_is_saved_to_private_account(tmp_path, monkeypat
         assert saved["customer_id"] == customer_id
         assert saved["body_fat"] == 16.5
         assert saved["muscle_mass"] == 35.6
+
+def test_account_shows_customer_subscription_history(tmp_path, monkeypatch):
+    monkeypatch.setattr(app_module, "CUSTOMER_DB_PATH", str(tmp_path / "customers.db"))
+    subscriptions = tmp_path / "subscriptions.jsonl"
+    monkeypatch.setattr(app_module, "SUBSCRIPTIONS_LOG_PATH", str(subscriptions))
+    with app_module.customer_db() as connection:
+        connection.execute(
+            "INSERT INTO customers (name, phone, pin_hash, created_at) VALUES (?, ?, ?, ?)",
+            ("Plan Customer", "0912345678", app_module.generate_password_hash("1234"), "2026-01-01"),
+        )
+        connection.commit()
+        customer_id = connection.execute("SELECT id FROM customers").fetchone()["id"]
+    subscriptions.write_text(json.dumps({
+        "subscription_id": "PLAN1234", "created_at": "2026-02-01T10:00:00+00:00",
+        "customer": {"name": "Plan Customer", "phone": "0912345678"},
+        "customer_id": customer_id, "plan_name": "Full Coaching Plan", "coach_id": None, "price": 120,
+    }) + "\n", encoding="utf-8")
+    client = app.test_client()
+    with client.session_transaction() as session:
+        session["customer_id"] = customer_id
+    response = client.get("/account")
+    body = response.data.decode()
+    assert response.status_code == 200
+    assert "My plans &amp; subscriptions" in body
+    assert "Full Coaching Plan" in body
+    assert "PLAN1234" in body
