@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import secrets
 import smtplib
@@ -226,6 +227,27 @@ def customer_db():
             created_at TEXT NOT NULL
         )
     """)
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS body_scans (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+            created_at TEXT NOT NULL,
+            gender TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            weight REAL NOT NULL,
+            height REAL NOT NULL,
+            body_fat REAL NOT NULL,
+            fat_mass REAL NOT NULL,
+            lean_mass REAL NOT NULL,
+            muscle_mass REAL NOT NULL,
+            water REAL NOT NULL,
+            bmi REAL NOT NULL,
+            bmr REAL NOT NULL,
+            whtr REAL NOT NULL,
+            score INTEGER NOT NULL,
+            protein INTEGER NOT NULL
+        )
+    """)
     connection.commit()
     return connection
 
@@ -323,6 +345,20 @@ def customer_orders(phone):
                 orders.append(order)
     return list(reversed(orders[-20:]))
 
+
+def customer_body_scans(customer_id):
+    with customer_db() as connection:
+        rows = connection.execute(
+            """SELECT id, created_at, gender, age, weight, height, body_fat,
+                      fat_mass, lean_mass, muscle_mass, water, bmi, bmr, whtr,
+                      score, protein
+               FROM body_scans
+               WHERE customer_id = ?
+               ORDER BY datetime(created_at) DESC, id DESC
+               LIMIT 30""",
+            (customer_id,),
+        ).fetchall()
+    return [dict(row) for row in rows]
 
 def update_customer_points(customer_id, change):
     with customer_db() as connection:
@@ -741,7 +777,7 @@ def account():
                     return redirect(url_for("account"))
     customer = current_customer()
     if customer:
-        return render_template("account.html", customer=customer, orders=customer_orders(customer["phone"]), currency="LYD")
+        return render_template("account.html", customer=customer, orders=customer_orders(customer["phone"]), body_scans=customer_body_scans(customer["id"]), currency="LYD")
     return render_template("account_auth.html", errors=errors, form=request.form if request.method == "POST" else {})
 
 
@@ -826,6 +862,56 @@ def account_verify():
     return render_template(
         "account_verify.html", errors=errors, notice=notice, masked_email=masked_email
     )
+
+@app.route("/api/account/body-scans", methods=["POST"])
+def save_body_scan():
+    customer = current_customer()
+    if not customer:
+        return jsonify({"error": "authentication_required"}), 401
+
+    payload = request.get_json(silent=True) or {}
+    try:
+        gender = str(payload.get("gender", "")).strip().lower()
+        age = int(payload["age"])
+        weight = float(payload["weight"])
+        height = float(payload["height"])
+        body_fat = float(payload["bodyFat"])
+        fat_mass = float(payload["fatMass"])
+        lean_mass = float(payload["leanMass"])
+        muscle_mass = float(payload["muscleMass"])
+        water = float(payload["water"])
+        bmi = float(payload["bmi"])
+        bmr = float(payload["bmr"])
+        whtr = float(payload["whtr"])
+        score = int(payload["score"])
+        protein = int(payload["protein"])
+    except (KeyError, TypeError, ValueError):
+        return jsonify({"error": "invalid_body_scan"}), 400
+
+    if gender not in {"male", "female"}:
+        return jsonify({"error": "invalid_body_scan"}), 400
+    if not 13 <= age <= 100 or not 25 <= weight <= 400 or not 100 <= height <= 250:
+        return jsonify({"error": "invalid_body_scan"}), 400
+    if not 0 <= body_fat <= 60 or not 0 <= bmi <= 100 or not 0 <= score <= 100:
+        return jsonify({"error": "invalid_body_scan"}), 400
+    numeric_values = (fat_mass, lean_mass, muscle_mass, water, bmr, whtr)
+    if not all(math.isfinite(value) and value >= 0 for value in numeric_values):
+        return jsonify({"error": "invalid_body_scan"}), 400
+
+    created_at = datetime.now(timezone.utc).isoformat()
+    with customer_db() as connection:
+        cursor = connection.execute(
+            """INSERT INTO body_scans
+               (customer_id, created_at, gender, age, weight, height, body_fat,
+                fat_mass, lean_mass, muscle_mass, water, bmi, bmr, whtr, score, protein)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                customer["id"], created_at, gender, age, weight, height, body_fat,
+                fat_mass, lean_mass, muscle_mass, water, bmi, bmr, whtr, score, protein,
+            ),
+        )
+        connection.commit()
+    return jsonify({"saved": True, "id": cursor.lastrowid}), 201
 
 @app.route("/account/logout", methods=["POST"])
 def account_logout():

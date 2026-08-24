@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const idealBf = gender === "male" ? 15 : 23;
     const score = Math.round(Math.max(55, Math.min(98, 92 - Math.abs(bodyFat - idealBf) * 1.15 - Math.abs(bmi - 22) * 1.1)));
     const protein = Math.round(weight * 2);
-    lastBodyScan = {bodyFat, fatMass, leanMass, muscleMass, water, bmi, bmr, whtr, score, protein, weight};
+    lastBodyScan = {gender, age, weight, height, bodyFat, fatMass, leanMass, muscleMass, water, bmi, bmr, whtr, score, protein};
     const progress = document.getElementById("bodyscan-progress");
     const report = document.getElementById("bodyscan-report");
     progress.hidden = false; report.hidden = true;
@@ -219,7 +219,28 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => bodyShare.textContent = old, 1800);
     });
   });
-  form.querySelectorAll("input, select").forEach((el) => {
+  const bodySave = document.getElementById("bodyscan-save");
+  const bodySaveStatus = document.getElementById("bodyscan-save-status");
+  if (bodySave) bodySave.addEventListener("click", async () => {
+    if (!lastBodyScan || bodySave.disabled) return;
+    bodySave.disabled = true;
+    if (bodySaveStatus) bodySaveStatus.textContent = isArabic ? "جارٍ حفظ القياس..." : "Saving measurement...";
+    try {
+      const response = await fetch("/api/account/body-scans", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", "Accept": "application/json"},
+        credentials: "same-origin",
+        body: JSON.stringify(lastBodyScan),
+      });
+      if (!response.ok) throw new Error("save_failed");
+      bodySave.classList.add("is-saved");
+      bodySave.textContent = isArabic ? "تم حفظ القياس" : "Measurement saved";
+      if (bodySaveStatus) bodySaveStatus.textContent = isArabic ? "تمت إضافة القياس إلى ملف تقدمك." : "Added to your progress history.";
+    } catch (error) {
+      if (bodySaveStatus) bodySaveStatus.textContent = isArabic ? "تعذر الحفظ الآن. حاول مرة أخرى." : "Could not save right now. Try again.";
+      bodySave.disabled = false;
+    }
+  });`n  form.querySelectorAll("input, select").forEach((el) => {
     el.addEventListener("change", () => {
       if (hasResults()) calculate();
     });

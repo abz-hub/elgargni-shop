@@ -827,3 +827,45 @@ def test_ai_prompt_does_not_use_stale_fixed_coaching_price(monkeypatch):
     instructions = captured["payload"]["instructions"]
     assert "cost 250 LYD" not in instructions
     assert "current plan and coach prices" in instructions
+
+def test_body_scan_requires_authenticated_customer():
+    response = app.test_client().post("/api/account/body-scans", json={})
+    assert response.status_code == 401
+    assert response.get_json()["error"] == "authentication_required"
+
+
+def test_authenticated_body_scan_is_saved_to_private_account(tmp_path, monkeypatch):
+    monkeypatch.setattr(app_module, "CUSTOMER_DB_PATH", str(tmp_path / "customers.db"))
+    with app_module.customer_db() as connection:
+        connection.execute(
+            "INSERT INTO customers (name, phone, pin_hash, created_at) VALUES (?, ?, ?, ?)",
+            ("Progress Customer", "0912345678", app_module.generate_password_hash("1234"), "2026-01-01"),
+        )
+        connection.commit()
+        customer_id = connection.execute("SELECT id FROM customers").fetchone()["id"]
+
+    payload = {
+        "gender": "male", "age": 28, "weight": 82, "height": 180,
+        "bodyFat": 16.5, "fatMass": 13.5, "leanMass": 68.5,
+        "muscleMass": 35.6, "water": 50.0, "bmi": 25.3, "bmr": 1810,
+        "whtr": 0.46, "score": 87, "protein": 164,
+    }
+    client = app.test_client()
+    with client.session_transaction() as session:
+        session["customer_id"] = customer_id
+    response = client.post("/api/account/body-scans", json=payload)
+    assert response.status_code == 201
+    assert response.get_json()["saved"] is True
+
+    account = client.get("/account")
+    body = account.data.decode()
+    assert account.status_code == 200
+    assert "My body progress" in body
+    assert "35.6" in body
+    with app_module.customer_db() as connection:
+        saved = connection.execute(
+            "SELECT customer_id, body_fat, muscle_mass FROM body_scans"
+        ).fetchone()
+        assert saved["customer_id"] == customer_id
+        assert saved["body_fat"] == 16.5
+        assert saved["muscle_mass"] == 35.6
