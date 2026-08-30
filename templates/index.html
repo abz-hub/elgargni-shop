@@ -169,6 +169,37 @@
     </div>
   </section>
 
+  <section id="learning" class="section home-learning-section">
+    <div class="container">
+      <div class="home-learning-heading reveal">
+        <div>
+          <p class="eyebrow">{{ t('learn.eyebrow') }}</p>
+          <h2>{{ t('learn.home_title') }}</h2>
+        </div>
+        <div>
+          <p>{{ t('learn.home_subtitle') }}</p>
+          <a class="text-link" href="{{ url_for('learn') }}">{{ t('learn.view_all') }} <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <div class="home-learning-grid">
+        {% for video in educational_videos[:3] %}
+        <a class="home-learning-card reveal" href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank" rel="noopener noreferrer" style="--learn-delay: {{ loop.index0 * 0.08 }}s">
+          <div class="home-learning-media">
+            <img src="https://i.ytimg.com/vi/{{ video.video_id }}/hqdefault.jpg" alt="{{ video.title_ar if lang == 'ar' else video.title_en }}" width="480" height="360" loading="lazy" referrerpolicy="strict-origin-when-cross-origin">
+            <span class="learn-card-overlay"></span>
+            <span class="learn-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m9 5 10 7-10 7V5Z"/></svg></span>
+            <span class="learn-duration">{{ video.duration }}</span>
+          </div>
+          <div class="home-learning-copy">
+            <span>{{ t('learn.category.' ~ video.category) }}</span>
+            <h3>{{ video.title_ar if lang == 'ar' else video.title_en }}</h3>
+            <b>{{ t('learn.watch') }} <i aria-hidden="true">↗</i></b>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
   <section id="coaches" class="section coaches-section">
     <div class="container">
       <div class="coaches-heading reveal">
