@@ -93,6 +93,58 @@ COACHES = [
     },
 ]
 
+EDUCATIONAL_VIDEOS = [
+    {
+        "video_id": "eckZQuZb0gM",
+        "category": "beginners",
+        "duration": "31:02",
+        "title_ar": "أول يوم في الجيم: جدول المبتدئين",
+        "title_en": "Your first day at the gym: a beginner plan",
+        "description_ar": "خطوات عملية وآمنة لتبدأ التمرين بثقة وتتعرف على أهم الحركات الأساسية.",
+        "description_en": "A practical, safe starting point to build confidence and learn the essential movements.",
+        "source": "GYM CAIRO",
+    },
+    {
+        "video_id": "g0og0NDl4_M",
+        "category": "exercises",
+        "duration": "10:10",
+        "title_ar": "تمارين الجزء العلوي للمبتدئين",
+        "title_en": "Upper-body exercises for beginners",
+        "description_ar": "تعرّف على طريقة أداء تمارين الصدر والظهر والكتفين والذراعين بشكل منظم.",
+        "description_en": "Learn a structured approach to chest, back, shoulder, and arm exercises.",
+        "source": "GYM CAIRO",
+    },
+    {
+        "video_id": "5jF-quUQM0Y",
+        "category": "beginners",
+        "duration": "12:08",
+        "title_ar": "تمارين لياقة للمبتدئين",
+        "title_en": "Fitness exercises for beginners",
+        "description_ar": "جلسة بسيطة تساعدك على بناء عادة الحركة وتحسين لياقتك تدريجيًا.",
+        "description_en": "A simple session to build a consistent movement habit and improve fitness gradually.",
+        "source": "Fitness Arabic",
+    },
+    {
+        "video_id": "DgJPQSD0nxA",
+        "category": "nutrition",
+        "duration": "09:42",
+        "title_ar": "أساسيات التغذية لبناء جسم قوي",
+        "title_en": "Nutrition basics for building a strong body",
+        "description_ar": "مقدمة مبسطة عن تنظيم الغذاء للمبتدئين في كمال الأجسام ودعم هدفك.",
+        "description_en": "A simple introduction to nutrition planning for bodybuilding beginners and goal support.",
+        "source": "Bodybuilding Arabic",
+    },
+    {
+        "video_id": "F8qPVAH3Quw",
+        "category": "basics",
+        "duration": "18:34",
+        "title_ar": "برنامج كامل للمبتدئين في كمال الأجسام",
+        "title_en": "A complete beginner bodybuilding program",
+        "description_ar": "نظرة شاملة على بداية رحلة بناء العضلات والتدرج في التدريب والتغذية.",
+        "description_en": "An overview of starting your muscle-building journey with progressive training and nutrition.",
+        "source": "Bodybuilding Arabic",
+    },
+]
 COACHING_PLANS = {
     coach["plan_id"]: {
         "id": coach["plan_id"],
@@ -631,6 +683,7 @@ def sitemap_xml():
         ("/", "1.0", "weekly"),
         ("/products", "0.9", "weekly"),
         ("/calculators", "0.8", "monthly"),
+        ("/learn", "0.8", "monthly"),
         ("/subscribe", "0.7", "monthly"),
     ]
     entries = "\n".join(
@@ -713,6 +766,7 @@ def index():
         categories=CATEGORIES,
         plan=SUBSCRIPTION_PLAN,
         coaches=COACHES,
+        educational_videos=EDUCATIONAL_VIDEOS,
         currency="LYD",
     )
 
@@ -1157,5 +1211,10 @@ def calculators():
     )
 
 
+
+
+@app.route("/learn")
+def learn():
+    return render_template("learn.html", educational_videos=EDUCATIONAL_VIDEOS)
 if __name__ == "__main__":
     app.run(debug=True)

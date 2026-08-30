@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('learn.title') }} - Elgargni Shop{% endblock %}
+{% block meta_description %}{{ t('learn.meta') }}{% endblock %}
+{% block content %}
+  <section class="section learn-hero">
+    <div class="learn-hero-grid" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="container learn-hero-content">
+      <div class="learn-hero-copy reveal">
+        <p class="eyebrow">{{ t('learn.eyebrow') }}</p>
+        <h1>{{ t('learn.title') }}</h1>
+        <p>{{ t('learn.subtitle') }}</p>
+        <a class="btn" href="#learn-library">{{ t('learn.start') }} <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="learn-hero-card reveal" aria-label="{{ t('learn.hero_card_label') }}">
+        <div class="learn-hero-card-top"><span class="learn-live-dot"></span>{{ t('learn.learning_path') }}<strong>01—05</strong></div>
+        <div class="learn-path-line"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="learn-hero-card-bottom"><strong>{{ t('learn.path_begin') }}</strong><span>{{ t('learn.path_progress') }}</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section learn-library" id="learn-library">
+    <div class="container">
+      <div class="learn-section-heading reveal">
+        <div>
+          <p class="eyebrow">{{ t('learn.library_eyebrow') }}</p>
+          <h2>{{ t('learn.library_title') }}</h2>
+        </div>
+        <p>{{ t('learn.library_subtitle') }}</p>
+      </div>
+
+      <div class="learn-filters reveal" role="group" aria-label="{{ t('learn.filter_label') }}">
+        <button class="learn-filter is-active" type="button" data-learn-filter="all">{{ t('learn.filter_all') }}</button>
+        <button class="learn-filter" type="button" data-learn-filter="beginners">{{ t('learn.filter_beginners') }}</button>
+        <button class="learn-filter" type="button" data-learn-filter="exercises">{{ t('learn.filter_exercises') }}</button>
+        <button class="learn-filter" type="button" data-learn-filter="nutrition">{{ t('learn.filter_nutrition') }}</button>
+        <button class="learn-filter" type="button" data-learn-filter="basics">{{ t('learn.filter_basics') }}</button>
+      </div>
+
+      <div class="learn-grid">
+        {% for video in educational_videos %}
+        <article class="learn-card reveal" data-learn-category="{{ video.category }}" style="--learn-delay: {{ loop.index0 * 0.06 }}s">
+          <a class="learn-card-media" href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank" rel="noopener noreferrer" aria-label="{{ video.title_ar if lang == 'ar' else video.title_en }}">
+            <img src="https://i.ytimg.com/vi/{{ video.video_id }}/hqdefault.jpg" alt="{{ video.title_ar if lang == 'ar' else video.title_en }}" width="480" height="360" loading="lazy" referrerpolicy="strict-origin-when-cross-origin">
+            <span class="learn-card-overlay"></span>
+            <span class="learn-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m9 5 10 7-10 7V5Z"/></svg></span>
+            <span class="learn-duration">{{ video.duration }}</span>
+          </a>
+          <div class="learn-card-body">
+            <div class="learn-card-meta"><span>{{ t('learn.category.' ~ video.category) }}</span><small>{{ video.source }}</small></div>
+            <h2>{{ video.title_ar if lang == 'ar' else video.title_en }}</h2>
+            <p>{{ video.description_ar if lang == 'ar' else video.description_en }}</p>
+            <a class="learn-watch-link" href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank" rel="noopener noreferrer">{{ t('learn.watch') }} <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      <div class="learn-empty" data-learn-empty hidden>{{ t('learn.empty') }}</div>
+      <div class="learn-disclaimer reveal">
+        <span aria-hidden="true">i</span>
+        <p>{{ t('learn.disclaimer') }}</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+{% block extra_scripts %}<script src="{{ url_for('static', filename='js/learn.js') }}"></script>{% endblock %}
